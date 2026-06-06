@@ -12,18 +12,20 @@ Important behavior:
 Daily briefing:
 
 ```bash
-hermes cron create "every 1d at 08:00" \
+hermes cron create "0 8 * * *" \
   "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and deliver a concise family summary back to the Feishu/Lark home chat." \
   --skill family-intelligence-briefing \
+  --deliver feishu \
   --name family-daily-briefing
 ```
 
 Weekly consolidation:
 
 ```bash
-hermes cron create "every sunday at 20:00" \
+hermes cron create "0 20 * * 0" \
   "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a weekly family intelligence report and update topic notes in the configured vault path." \
   --skill family-intelligence-briefing \
+  --deliver feishu \
   --name family-weekly-knowledge
 ```
 

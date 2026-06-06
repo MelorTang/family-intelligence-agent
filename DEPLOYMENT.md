@@ -31,8 +31,8 @@ hermes config show
 
 ```bash
 hermes config set skills.config.family_intelligence.vault_path ~/family-intelligence-vault
-hermes config set skills.config.family_intelligence.daily_schedule "every 1d at 08:00"
-hermes config set skills.config.family_intelligence.weekly_schedule "every sunday at 20:00"
+hermes config set skills.config.family_intelligence.daily_schedule "0 8 * * *"
+hermes config set skills.config.family_intelligence.weekly_schedule "0 20 * * 0"
 hermes config set skills.config.family_intelligence.timezone Asia/Seoul
 ```
 
@@ -87,19 +87,29 @@ ls -la ~/family-intelligence-vault
 日报：
 
 ```bash
-hermes cron create "every 1d at 08:00" \
+hermes cron create "0 8 * * *" \
   "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and deliver a concise family summary back to the Feishu/Lark home chat." \
   --skill family-intelligence-briefing \
+  --deliver feishu \
   --name family-daily-briefing
 ```
 
 周报：
 
 ```bash
-hermes cron create "every sunday at 20:00" \
+hermes cron create "0 20 * * 0" \
   "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a weekly family intelligence report and update topic notes in the configured vault path." \
   --skill family-intelligence-briefing \
+  --deliver feishu \
   --name family-weekly-knowledge
+```
+
+家庭群安静模式：
+
+```bash
+hermes config set display.platforms.feishu.tool_progress off
+hermes config set display.interim_assistant_messages false
+hermes gateway restart
 ```
 
 ## 7. 运维命令
