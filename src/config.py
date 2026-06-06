@@ -21,6 +21,7 @@ from .utils import PROJECT_ROOT
 
 DEFAULT_CONFIG: dict[str, Any] = {
     "app": {"name": "家庭全球资讯与投资观察助手", "language": "zh-CN", "timezone": "Asia/Seoul"},
+    "llm": {"base_url": "https://api.openai.com/v1", "model": "gpt-4.1-mini"},
     "search": {"max_results_per_query": 5, "search_depth": "basic", "include_answer": True, "include_raw_content": False},
     "briefing": {"max_news_items": 12, "final_top_items": 5},
     "queries": {},
@@ -33,8 +34,9 @@ class Settings:
 
     config: dict[str, Any]
     tavily_api_key: str
-    openai_api_key: str
-    openai_model: str
+    llm_api_key: str
+    llm_model: str
+    llm_base_url: str
     feishu_webhook_url: str
     feishu_secret: str
     obsidian_vault_path: Path
@@ -62,8 +64,9 @@ def load_settings(config_path: Path | None = None) -> Settings:
     return Settings(
         config=config,
         tavily_api_key=os.getenv("TAVILY_API_KEY", ""),
-        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
-        openai_model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
+        llm_api_key=os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY", ""),
+        llm_model=os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL") or config.get("llm", {}).get("model", "gpt-4.1-mini"),
+        llm_base_url=os.getenv("LLM_BASE_URL") or os.getenv("OPENAI_BASE_URL") or config.get("llm", {}).get("base_url", "https://api.openai.com/v1"),
         feishu_webhook_url=os.getenv("FEISHU_WEBHOOK_URL", ""),
         feishu_secret=os.getenv("FEISHU_SECRET", ""),
         obsidian_vault_path=obsidian_vault_path,

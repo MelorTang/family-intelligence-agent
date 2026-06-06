@@ -37,8 +37,9 @@ def run_daily(settings: Settings | None = None) -> dict:
     logger.info("Deduplicated %d raw items to %d items.", len(raw_items), len(deduped_items))
 
     generator = BriefingGenerator(
-        api_key=settings.openai_api_key,
-        model=settings.openai_model,
+        api_key=settings.llm_api_key,
+        model=settings.llm_model,
+        base_url=settings.llm_base_url,
         config=settings.config,
         timezone=settings.timezone,
     )
@@ -86,8 +87,9 @@ def run_weekly(settings: Settings | None = None) -> None:
     setup_logging(PROJECT_ROOT / "data" / "logs")
     manager = KnowledgeBaseManager(
         vault_path=Path(settings.obsidian_vault_path),
-        openai_api_key=settings.openai_api_key,
-        openai_model=settings.openai_model,
+        llm_api_key=settings.llm_api_key,
+        llm_model=settings.llm_model,
+        llm_base_url=settings.llm_base_url,
         timezone=settings.timezone,
     )
     result = manager.generate_weekly_knowledge()

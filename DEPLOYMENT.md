@@ -1,6 +1,6 @@
 # 云端部署说明
 
-这个项目现在按 Hermes-first 思路设计：Hermes Agent 是真正的 agent，负责自然语言控制、云端 gateway、cron 调度和排障；本项目是一个稳定的 Python runner，负责 Tavily 搜索、OpenAI 总结、Markdown 写入和飞书推送。
+这个项目现在按 Hermes-first 思路设计：Hermes Agent 是真正的 agent，负责自然语言控制、云端 gateway、cron 调度和排障；本项目是一个稳定的 Python runner，负责 Tavily 搜索、LLM 总结、Markdown 写入和飞书推送。
 
 ## 推荐架构：Hermes-first
 
@@ -48,6 +48,19 @@ cp -R skills/research/family-intelligence-briefing ~/.hermes/skills/research/
 cd family-intelligence-agent
 cp .env.example .env
 nano .env
+```
+
+如果你已经用 Hermes config 或 Hermes 环境管理密钥，可以不把真实密钥写进项目 `.env`。runner 只要求运行时能读到：
+
+```env
+TAVILY_API_KEY=
+LLM_BASE_URL=
+LLM_API_KEY=
+LLM_MODEL=
+FEISHU_WEBHOOK_URL=
+FEISHU_SECRET=
+OBSIDIAN_VAULT_PATH=
+TIMEZONE=
 ```
 
 如果只想把 runner 容器化，也可以启动：

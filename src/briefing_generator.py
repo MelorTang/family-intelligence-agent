@@ -17,22 +17,24 @@ logger = logging.getLogger(__name__)
 
 
 class BriefingGenerator:
-    """Generate a structured Chinese family briefing with OpenAI."""
+    """Generate a structured Chinese family briefing with an OpenAI-compatible LLM."""
 
     def __init__(
         self,
         api_key: str,
         model: str,
+        base_url: str,
         config: dict[str, Any],
         timezone: str,
         prompts_dir: Path | None = None,
     ) -> None:
         self.api_key = api_key
         self.model = model
+        self.base_url = base_url
         self.config = config
         self.timezone = timezone
         self.prompts_dir = prompts_dir or PROJECT_ROOT / "prompts"
-        self.client = OpenAI(api_key=api_key, timeout=60) if api_key and OpenAI else None
+        self.client = OpenAI(api_key=api_key, base_url=base_url, timeout=60) if api_key and OpenAI else None
 
     def generate_daily_briefing(self, items: list[dict]) -> dict:
         """Generate a JSON briefing and always return a dict with markdown."""
@@ -40,8 +42,8 @@ class BriefingGenerator:
         selected_items = items[: int(self.config.get("briefing", {}).get("max_news_items", 12))]
 
         if not self.client:
-            logger.warning("OPENAI_API_KEY is not configured; use fallback briefing.")
-            briefing = self._fallback_briefing(date, selected_items, "OPENAI_API_KEY 未配置，无法生成 LLM 简报。")
+            logger.warning("LLM_API_KEY is not configured; use fallback briefing.")
+            briefing = self._fallback_briefing(date, selected_items, "LLM_API_KEY 未配置，无法生成 LLM 简报。")
             briefing["markdown"] = self.to_markdown(briefing, selected_items)
             return briefing
 
@@ -67,7 +69,7 @@ class BriefingGenerator:
             )
             content = response.choices[0].message.content or ""
         except Exception as exc:
-            logger.exception("OpenAI briefing generation failed: %s", exc)
+            logger.exception("LLM briefing generation failed: %s", exc)
             briefing = self._fallback_briefing(date, selected_items, f"LLM 调用失败：{exc}")
             briefing["markdown"] = self.to_markdown(briefing, selected_items)
             return briefing

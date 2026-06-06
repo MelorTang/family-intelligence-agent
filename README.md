@@ -12,7 +12,7 @@ Hermes 是 agent；本项目只负责把固定流程稳定执行完。
 - 使用 Tavily 搜索配置好的资讯 query
 - 对搜索结果做本地 JSON 存档
 - 基于 URL、标题和正文片段做简单去重
-- 使用 OpenAI 生成结构化中文日报
+- 使用 OpenAI-compatible LLM 生成结构化中文日报
 - 自动生成 Obsidian Markdown
 - 从日报生成周报和主题知识沉淀
 - 使用飞书自定义机器人推送摘要
@@ -71,14 +71,38 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-## 配置 `.env`
+## 配置方式
+
+Hermes-first 部署时，推荐把密钥和模型配置交给 Hermes 管理。项目里的 `.env.example` 主要是本地测试模板，不是必须长期保存真实密钥。
+
+runner 读取这些通用变量：
+
+```env
+TAVILY_API_KEY=你的 Tavily API Key
+
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_API_KEY=你的模型服务 API Key
+LLM_MODEL=你的模型 ID
+
+FEISHU_WEBHOOK_URL=你的飞书机器人 Webhook
+FEISHU_SECRET=飞书机器人签名密钥，可留空
+
+OBSIDIAN_VAULT_PATH=./obsidian_output
+TIMEZONE=Asia/Seoul
+```
+
+兼容旧变量名：`OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL`。
+
+## 本地 `.env` 模板
 
 打开 `.env`，填入：
 
 ```env
 TAVILY_API_KEY=你的 Tavily API Key
-OPENAI_API_KEY=你的 OpenAI API Key
-OPENAI_MODEL=gpt-4.1-mini
+
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_API_KEY=你的模型服务 API Key
+LLM_MODEL=你的模型 ID
 
 FEISHU_WEBHOOK_URL=你的飞书机器人 Webhook
 FEISHU_SECRET=飞书机器人签名密钥，可留空
@@ -162,7 +186,7 @@ python main.py schedule
 ## 鲁棒性说明
 
 - 单个 Tavily query 失败不会中断整体任务。
-- OpenAI JSON 解析失败时会尝试提取 JSON；仍失败则保存原始内容或 fallback Markdown。
+- LLM JSON 解析失败时会尝试提取 JSON；仍失败则保存原始内容或 fallback Markdown。
 - 飞书推送失败会写日志并在命令行显示失败，不影响本地 Markdown 保存。
 - Obsidian 目录不存在会自动创建。
 - 外部请求设置了 timeout。

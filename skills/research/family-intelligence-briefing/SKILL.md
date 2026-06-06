@@ -31,13 +31,17 @@ required_environment_variables:
     prompt: Tavily API key
     help: Get one from https://tavily.com/
     required_for: Web search
-  - name: OPENAI_API_KEY
-    prompt: OpenAI API key
-    help: Get one from https://platform.openai.com/
+  - name: LLM_API_KEY
+    prompt: LLM API key
+    help: Any OpenAI-compatible provider key, such as OpenRouter, Nous Portal, OpenAI, Kimi, DeepSeek, SiliconFlow, or another endpoint.
     required_for: Briefing generation
-  - name: OPENAI_MODEL
-    prompt: OpenAI model name
-    help: Example: gpt-4.1-mini
+  - name: LLM_BASE_URL
+    prompt: LLM OpenAI-compatible base URL
+    help: Example: https://openrouter.ai/api/v1
+    required_for: Briefing generation
+  - name: LLM_MODEL
+    prompt: LLM model name
+    help: Example: openai/gpt-4.1-mini, deepseek/deepseek-chat, moonshotai/kimi-k2, or your provider's model id.
     required_for: Briefing generation
   - name: FEISHU_WEBHOOK_URL
     prompt: Feishu custom bot webhook URL
@@ -89,7 +93,7 @@ Use the Python runner for:
 
 1. Tavily search.
 2. Deduplication.
-3. OpenAI JSON briefing generation.
+3. OpenAI-compatible LLM briefing generation.
 4. Markdown rendering.
 5. Obsidian file output.
 6. Feishu webhook publishing.
@@ -133,8 +137,9 @@ Then make sure `.env` contains:
 
 ```env
 TAVILY_API_KEY=
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4.1-mini
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_API_KEY=
+LLM_MODEL=gpt-4.1-mini
 FEISHU_WEBHOOK_URL=
 FEISHU_SECRET=
 OBSIDIAN_VAULT_PATH=./obsidian_output
@@ -142,6 +147,8 @@ TIMEZONE=Asia/Seoul
 ```
 
 Never print secrets back to the user.
+
+If Hermes already manages secrets and non-secret settings, the project `.env` is optional. The runner only needs these values available in the process environment when Hermes executes `main.py`. Legacy `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_BASE_URL` are still supported as aliases.
 
 ## Run Once
 
@@ -216,7 +223,7 @@ If Tavily returns no results:
 3. Inspect `data/logs/app.log`.
 4. Check whether queries in `config.yaml` are too narrow.
 
-If OpenAI JSON parsing fails:
+If LLM JSON parsing fails:
 
 1. The runner should still save fallback Markdown.
 2. Inspect `data/processed/YYYY-MM-DD.json`.

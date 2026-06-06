@@ -33,16 +33,18 @@ class KnowledgeBaseManager:
     def __init__(
         self,
         vault_path: Path,
-        openai_api_key: str,
-        openai_model: str,
+        llm_api_key: str,
+        llm_model: str,
+        llm_base_url: str,
         timezone: str,
         prompts_dir: Path | None = None,
     ) -> None:
         self.vault_path = vault_path
-        self.openai_model = openai_model
+        self.llm_model = llm_model
+        self.llm_base_url = llm_base_url
         self.timezone = timezone
         self.prompts_dir = prompts_dir or PROJECT_ROOT / "prompts"
-        self.client = OpenAI(api_key=openai_api_key, timeout=60) if openai_api_key and OpenAI else None
+        self.client = OpenAI(api_key=llm_api_key, base_url=llm_base_url, timeout=60) if llm_api_key and OpenAI else None
 
     def generate_weekly_knowledge(self) -> dict[str, Any]:
         """Generate a weekly report from recent daily Markdown files and update topic notes."""
@@ -78,12 +80,12 @@ class KnowledgeBaseManager:
         )
 
         if not self.client:
-            return self._fallback_weekly_markdown(week_id, daily_files, "OPENAI_API_KEY 未配置，使用规则 fallback。")
+            return self._fallback_weekly_markdown(week_id, daily_files, "LLM_API_KEY 未配置，使用规则 fallback。")
 
         prompt = read_text(self.prompts_dir / "weekly_knowledge_prompt.md")
         try:
             response = self.client.chat.completions.create(
-                model=self.openai_model,
+                model=self.llm_model,
                 temperature=0.2,
                 messages=[
                     {
