@@ -60,6 +60,17 @@ def main() -> int:
         print(f"Feishu publish failed: {exc}", file=sys.stderr)
         return 1
 
+    try:
+        result = json.loads(body)
+    except json.JSONDecodeError:
+        print(f"Feishu returned non-JSON response: {body}", file=sys.stderr)
+        return 1
+
+    code = result.get("code", result.get("StatusCode", 0))
+    if code not in (0, None):
+        print(f"Feishu returned an error: {body}", file=sys.stderr)
+        return 1
+
     print(body)
     return 0
 

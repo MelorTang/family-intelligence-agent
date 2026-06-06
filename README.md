@@ -67,6 +67,16 @@ hermes config migrate
 
 飞书 webhook 和 secret 属于密钥，不要写进 Git。
 
+这里使用的是飞书「群自定义机器人」，它的定位是：通过 webhook 向创建它的当前群聊单向推送消息。它适合日报、告警、通知这类场景。
+
+它不是飞书「应用机器人」：
+
+- 不能响应家人在群里 @ 机器人的消息
+- 不能获取用户、租户、群成员等信息
+- 不能做单聊或复杂交互
+
+如果以后要让家人在飞书里直接提问、追问、点菜单，就需要改成飞书应用机器人，并接入事件订阅和消息 API。当前 MVP 只做定时推送，所以自定义机器人足够。
+
 如果你的 Hermes 环境支持环境变量管理，把它们放到 Hermes 的环境里：
 
 ```bash
@@ -77,6 +87,8 @@ export FEISHU_SECRET="..."
 如果你的 Hermes gateway 是 systemd/服务方式运行，请把这两个变量放到 Hermes 服务实际读取的环境文件中，然后重启 gateway。
 
 如果没有启用飞书签名，`FEISHU_SECRET` 可以为空。
+
+建议在飞书自定义机器人安全设置里启用签名校验；脚本已经按飞书规则生成 `timestamp` 和 `sign`。也可以结合关键词或 IP 白名单，但云服务器 IP 变化时要同步更新白名单。
 
 ## 创建 Cron
 
@@ -131,4 +143,4 @@ Hermes 已经支持：
 - 文件写入
 - config 和环境变量管理
 
-所以这个项目不再重复实现 Tavily client、LLM client、scheduler、Markdown writer。唯一保留的小脚本是飞书 custom bot webhook，因为这是一个特定平台推送适配。
+所以这个项目不再重复实现 Tavily client、LLM client、scheduler、Markdown writer。唯一保留的小脚本是飞书群自定义机器人 webhook，因为它是当前家庭群推送的最小平台适配。

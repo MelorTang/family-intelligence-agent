@@ -49,6 +49,10 @@ FEISHU_SECRET=
 
 如果 gateway 是 systemd 服务，放到服务环境文件里并重启服务。不要把真实 webhook 提交到 Git。
 
+这里使用飞书「群自定义机器人」，只负责向创建它的当前群聊单向推送消息。它不能响应群成员消息，也不能做单聊或复杂交互。后续如果要做可对话的飞书 Bot，需要升级为飞书应用机器人，并配置事件订阅和消息 API。
+
+建议启用自定义机器人的签名校验。`send_feishu_text.py` 已支持飞书 webhook 的 `timestamp` + `sign` 字段；`FEISHU_SECRET` 为空时会按未启用签名处理。
+
 ## 5. 手动测试
 
 在 Hermes 里运行：

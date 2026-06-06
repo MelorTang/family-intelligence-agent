@@ -164,6 +164,17 @@ source: hermes
 
 If `skills.config.family_intelligence.feishu_enabled` is true, send a short text summary to Feishu using `scripts/send_feishu_text.py`.
 
+This integration uses a Feishu group custom bot webhook. Treat it as one-way publishing into the group where the custom bot was created. It is suitable for daily reports and notifications.
+
+Do not assume the custom bot can:
+
+- respond to @ mentions
+- read user, tenant, or group-member information
+- handle direct messages
+- provide interactive bot menus
+
+If the user wants interactive Q&A inside Feishu later, recommend a Feishu app bot with event subscriptions and message APIs instead of a custom bot webhook.
+
 The Feishu message should contain:
 
 - 标题和日期
