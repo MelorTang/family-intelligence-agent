@@ -1,13 +1,13 @@
 ---
 name: family-intelligence-briefing
-description: Hermes-native workflow for Chinese family global news, investment risk observation, Feishu delivery, and Obsidian-style knowledge notes.
-version: 0.2.0
+description: Hermes-native workflow for Chinese family global news, investment risk observation, Feishu/Lark app-bot conversations, cron delivery, and Obsidian-style knowledge notes.
+version: 0.3.0
 author: MelorTang
 license: MIT
 platforms: [linux, macos]
 metadata:
   hermes:
-    tags: [research, news, finance, feishu, obsidian, automation, chinese, family]
+    tags: [research, news, finance, feishu, lark, obsidian, automation, chinese, family]
     requires_toolsets: [web, terminal]
     config:
       - key: family_intelligence.vault_path
@@ -30,37 +30,25 @@ metadata:
         description: Briefing audience and tone.
         default: "普通家庭成员，尤其是不擅长主动搜索信息、容易处于信息茧房的家人"
         prompt: Audience description
-      - key: family_intelligence.feishu_enabled
-        description: Whether to publish the daily summary to a Feishu custom bot.
-        default: "true"
-        prompt: Enable Feishu publishing
-required_environment_variables:
-  - name: FEISHU_WEBHOOK_URL
-    prompt: Feishu custom bot webhook URL
-    help: Only required when family_intelligence.feishu_enabled is true.
-    required_for: Feishu publishing
-  - name: FEISHU_SECRET
-    prompt: Feishu custom bot signing secret
-    help: Optional. Leave empty if Feishu signing is disabled.
-    required_for: Signed Feishu webhook publishing
 ---
 
 # Family Intelligence Briefing
 
 ## Core Principle
 
-Hermes is the agent. Do not build or call a separate news agent.
+Hermes is the agent. Do not build or call a separate news agent, LLM runner, scheduler, Feishu webhook sender, or database.
 
 Use Hermes built-ins for:
 
 - model/provider selection via `hermes model` and Hermes config
+- Feishu/Lark messaging through Hermes gateway
 - web research through the active web/search tools
 - cron scheduling through Hermes cron
 - file writing through terminal/file tools
 - memory and long-term learning through Hermes itself
 - skill settings through `skills.config.family_intelligence.*`
 
-This skill is a workflow contract and prompt pack. It should guide Hermes to produce a calm Chinese family briefing, save Markdown knowledge notes, and optionally post a short text summary to Feishu.
+This skill is a workflow contract and prompt pack. It should guide Hermes to produce a calm Chinese family briefing, save Markdown knowledge notes, and reply naturally in Feishu/Lark conversations.
 
 ## When to Use
 
@@ -70,9 +58,40 @@ Use this skill when the user asks for:
 - 投资观察、市场风险、家庭资产风险提醒
 - 给家人看的全球热点资讯摘要
 - 信息茧房破除
-- 飞书群定时推送
+- 飞书单聊或群里 @ 机器人提问
+- 飞书群定时日报/周报
 - Obsidian / Markdown 知识库沉淀
 - 周报、主题页、长期知识沉淀
+
+## Feishu/Lark App Bot Behavior
+
+This skill assumes Hermes is connected through its native Feishu/Lark messaging gateway.
+
+Expected behavior:
+
+- The user can DM the Feishu/Lark app bot.
+- Family members can add the app bot to a group.
+- In groups, Hermes replies when the bot is mentioned, subject to Hermes gateway behavior and Feishu permissions.
+- Hermes cron can deliver scheduled daily/weekly outputs back to the configured Feishu/Lark chat.
+
+Do not use Feishu group custom bot webhook for this project.
+
+Feishu Open Platform setup is outside this skill but should include:
+
+- self-built app
+- bot capability enabled
+- event subscription for receiving messages
+- permissions for p2p messages, group @ messages, and sending/replying to messages
+- published app
+- app bot added to the target family group
+
+Hermes setup should be done with:
+
+```bash
+hermes gateway setup
+```
+
+Select Feishu/Lark and follow the prompts.
 
 ## Safety and Tone
 
@@ -119,7 +138,7 @@ When running the daily briefing:
 4. Produce a family-readable Chinese report.
 5. Save full Markdown to `{vault_path}/01_Daily/YYYY-MM-DD.md`.
 6. Save raw links and brief source notes to `{vault_path}/99_Raw/YYYY-MM-DD.md` when useful.
-7. Publish a shorter summary to Feishu if enabled.
+7. Return a shorter summary to the active Feishu/Lark chat when invoked from Feishu. For scheduled runs, deliver the summary through Hermes cron's configured delivery/home chat behavior.
 
 Daily Markdown format:
 
@@ -160,22 +179,11 @@ source: hermes
 ## 原始来源
 ```
 
-## Feishu Publishing
+## Feishu/Lark Summary
 
-If `skills.config.family_intelligence.feishu_enabled` is true, send a short text summary to Feishu using `scripts/send_feishu_text.py`.
+When replying in Feishu/Lark, keep the message concise and family-readable.
 
-This integration uses a Feishu group custom bot webhook. Treat it as one-way publishing into the group where the custom bot was created. It is suitable for daily reports and notifications.
-
-Do not assume the custom bot can:
-
-- respond to @ mentions
-- read user, tenant, or group-member information
-- handle direct messages
-- provide interactive bot menus
-
-If the user wants interactive Q&A inside Feishu later, recommend a Feishu app bot with event subscriptions and message APIs instead of a custom bot webhook.
-
-The Feishu message should contain:
+The chat summary should contain:
 
 - 标题和日期
 - 一句话总结
@@ -183,29 +191,7 @@ The Feishu message should contain:
 - 今日投资温度
 - 给家人的提醒
 
-Keep the message under 3000 Chinese characters.
-
-Example:
-
-```bash
-python ~/.hermes/skills/research/family-intelligence-briefing/scripts/send_feishu_text.py <<'EOF'
-🌍 今日家庭全球简报｜YYYY-MM-DD
-
-一句话总结：...
-
-今日最重要的 5 件事：
-1. ...
-
-今日投资温度：
-美股：...
-A股：...
-
-给家人的提醒：
-今天没有必须马上行动的大事。不要因为单条新闻冲动投资。
-EOF
-```
-
-If Feishu is not configured, still save the Markdown report and tell the user Feishu was skipped.
+Keep the chat message under 3000 Chinese characters unless the user explicitly asks for the full report. The full report should live in the Markdown knowledge base.
 
 ## Weekly Workflow
 
@@ -253,7 +239,7 @@ Daily:
 
 ```bash
 hermes cron create "every 1d at 08:00" \
-  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and publish the short summary to Feishu if configured." \
+  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and deliver a concise family summary back to the Feishu/Lark home chat." \
   --skill family-intelligence-briefing \
   --name family-daily-briefing
 ```
@@ -270,7 +256,7 @@ hermes cron create "every sunday at 20:00" \
 ## Troubleshooting
 
 - If the briefing lacks sources, rerun with explicit instruction to use web/search tools and include URLs.
-- If Feishu fails, check `FEISHU_WEBHOOK_URL` and `FEISHU_SECRET` in Hermes environment.
+- If Feishu/Lark messages do not arrive, run `hermes gateway status`, check Feishu/Lark platform setup, app bot permissions, event subscription, and gateway logs.
 - If notes are missing, check `skills.config.family_intelligence.vault_path`.
 - If the model choice is wrong, use Hermes-native model configuration (`hermes model`, `hermes setup`, or Hermes config), not project `.env`.
 - If cron does not run, check `hermes cron status` and ensure the Hermes gateway is running.

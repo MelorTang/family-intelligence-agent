@@ -13,7 +13,7 @@ Daily briefing:
 
 ```bash
 hermes cron create "every 1d at 08:00" \
-  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and publish the short summary to Feishu if configured." \
+  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and deliver a concise family summary back to the Feishu/Lark home chat." \
   --skill family-intelligence-briefing \
   --name family-daily-briefing
 ```

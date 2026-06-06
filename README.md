@@ -1,16 +1,17 @@
 # Family Intelligence Briefing for Hermes
 
-这是一个 **Hermes-native skill**，用于让 Hermes 定期生成中文家庭全球资讯与投资风险观察简报。
+这是一个 **Hermes-native skill**，用于让 Hermes 在飞书里像正常应用机器人一样工作：可以单聊、可以在群里被 @ 回复，同时支持定时日报、周报和 Markdown / Obsidian 风格知识沉淀。
 
-目标不是再造一个 agent。Hermes 已经负责模型、搜索、记忆、定时任务、工具调用和云端常驻；这个仓库只提供：
+目标不是再造 agent，也不是做飞书 webhook 通知脚本。Hermes 已经支持 Feishu/Lark messaging gateway，本仓库只提供：
 
 - `SKILL.md`：告诉 Hermes 如何做家庭资讯日报、周报和知识沉淀
-- `send_feishu_text.py`：飞书自定义机器人文本推送小脚本
-- 部署说明：如何把 skill 安装到云端 Hermes
+- 部署说明：如何把 skill 安装到云端 Hermes，并配合 Hermes Feishu/Lark gateway 使用
 
 ## 用途
 
-- 每天给家人推送全球热点、市场风险、科技新闻、地缘风险、生活风险提醒
+- 家人在飞书里直接和 Hermes 应用机器人单聊
+- 家庭群里 @ 机器人后获得回复
+- 每天定时推送全球热点、市场风险、科技新闻、地缘风险、生活风险提醒
 - 帮不擅长主动搜索信息的家人打破信息茧房
 - 给你自己沉淀 Markdown / Obsidian 风格知识库
 - 每周整理主题页和资产观察页
@@ -26,10 +27,9 @@ git clone https://github.com/MelorTang/family-intelligence-agent.git
 cd family-intelligence-agent
 mkdir -p ~/.hermes/skills/research
 cp -R skills/research/family-intelligence-briefing ~/.hermes/skills/research/
-chmod +x ~/.hermes/skills/research/family-intelligence-briefing/scripts/send_feishu_text.py
 ```
 
-然后在 Hermes 中使用：
+然后在 Hermes 或飞书里使用：
 
 ```text
 /family-intelligence-briefing 跑一次今天的家庭全球简报
@@ -52,7 +52,6 @@ hermes config set skills.config.family_intelligence.vault_path ~/family-intellig
 hermes config set skills.config.family_intelligence.daily_schedule "every 1d at 08:00"
 hermes config set skills.config.family_intelligence.weekly_schedule "every sunday at 20:00"
 hermes config set skills.config.family_intelligence.timezone Asia/Seoul
-hermes config set skills.config.family_intelligence.feishu_enabled true
 ```
 
 也可以运行：
@@ -63,32 +62,33 @@ hermes config migrate
 
 让 Hermes 根据 skill frontmatter 提示你补齐配置。
 
-## 飞书 Webhook
+## 飞书应用机器人
 
-飞书 webhook 和 secret 属于密钥，不要写进 Git。
+使用 Hermes 自带的 **Feishu/Lark messaging gateway**，对应飞书开放平台里的「应用机器人」。不要使用群自定义机器人 webhook。
 
-这里使用的是飞书「群自定义机器人」，它的定位是：通过 webhook 向创建它的当前群聊单向推送消息。它适合日报、告警、通知这类场景。
+飞书开放平台侧需要：
 
-它不是飞书「应用机器人」：
+- 创建自建应用
+- 开启机器人能力
+- 配置事件订阅，订阅「接收消息」事件
+- 申请单聊消息、群聊 @ 消息、发送/回复消息相关权限
+- 发布应用
+- 把应用机器人添加到目标家庭群
 
-- 不能响应家人在群里 @ 机器人的消息
-- 不能获取用户、租户、群成员等信息
-- 不能做单聊或复杂交互
-
-如果以后要让家人在飞书里直接提问、追问、点菜单，就需要改成飞书应用机器人，并接入事件订阅和消息 API。当前 MVP 只做定时推送，所以自定义机器人足够。
-
-如果你的 Hermes 环境支持环境变量管理，把它们放到 Hermes 的环境里：
+Hermes 侧：
 
 ```bash
-export FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-export FEISHU_SECRET="..."
+hermes gateway setup
 ```
 
-如果你的 Hermes gateway 是 systemd/服务方式运行，请把这两个变量放到 Hermes 服务实际读取的环境文件中，然后重启 gateway。
+在平台列表里选择 Feishu/Lark，按提示填入飞书应用凭据。配置完成后启动或重启 gateway：
 
-如果没有启用飞书签名，`FEISHU_SECRET` 可以为空。
+```bash
+hermes gateway restart
+hermes gateway status
+```
 
-建议在飞书自定义机器人安全设置里启用签名校验；脚本已经按飞书规则生成 `timestamp` 和 `sign`。也可以结合关键词或 IP 白名单，但云服务器 IP 变化时要同步更新白名单。
+Hermes 文档中 Feishu/Lark 是完整 messaging platform，支持文本、图片、文件、线程、反应、typing、streaming 等能力，并有独立 toolset `hermes-feishu`。实际权限仍取决于飞书应用授权和事件订阅。
 
 ## 创建 Cron
 
@@ -96,7 +96,7 @@ export FEISHU_SECRET="..."
 
 ```bash
 hermes cron create "every 1d at 08:00" \
-  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and publish the short summary to Feishu if configured." \
+  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and deliver a concise family summary back to the Feishu/Lark home chat." \
   --skill family-intelligence-briefing \
   --name family-daily-briefing
 ```
@@ -139,8 +139,9 @@ Hermes 已经支持：
 - skills
 - cron
 - gateway
+- Feishu/Lark messaging platform
 - memory
 - 文件写入
 - config 和环境变量管理
 
-所以这个项目不再重复实现 Tavily client、LLM client、scheduler、Markdown writer。唯一保留的小脚本是飞书群自定义机器人 webhook，因为它是当前家庭群推送的最小平台适配。
+所以这个项目不再重复实现 Tavily client、LLM client、scheduler、Markdown writer、飞书消息 API 或 webhook。它只是一个 Hermes skill。
