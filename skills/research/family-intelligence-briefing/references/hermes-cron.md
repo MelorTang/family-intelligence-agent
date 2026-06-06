@@ -1,30 +1,29 @@
 # Hermes Cron Notes
 
-Use Hermes cron as the scheduler when Hermes is already deployed.
+Use Hermes cron directly. Do not run a separate scheduler service for this project.
 
 Important behavior:
 
 - Hermes gateway executes cron jobs.
-- The gateway checks due jobs periodically.
-- Use `--workdir` so commands run in the project directory.
-- Cron job prompts should be self-contained.
-- Prefer script-only or no-agent cron for deterministic commands when available.
+- Cron jobs can attach skills with `--skill`.
+- Prompts should be self-contained because cron runs in fresh sessions.
+- Use `hermes cron status` and `hermes cron list` for operations.
 
-Recommended command:
+Daily briefing:
 
 ```bash
 hermes cron create "every 1d at 08:00" \
-  "Run the family intelligence briefing workflow with: .venv/bin/python main.py run-daily. If it fails, inspect data/logs/app.log and summarize the error." \
-  --workdir /absolute/path/to/family-intelligence-agent \
+  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and publish the short summary to Feishu if configured." \
+  --skill family-intelligence-briefing \
   --name family-daily-briefing
 ```
 
-Recommended weekly knowledge-base job:
+Weekly consolidation:
 
 ```bash
 hermes cron create "every sunday at 20:00" \
-  "Run the family intelligence weekly knowledge workflow with: .venv/bin/python main.py run-weekly. If it fails, inspect data/logs/app.log and summarize the error." \
-  --workdir /absolute/path/to/family-intelligence-agent \
+  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a weekly family intelligence report and update topic notes in the configured vault path." \
+  --skill family-intelligence-briefing \
   --name family-weekly-knowledge
 ```
 

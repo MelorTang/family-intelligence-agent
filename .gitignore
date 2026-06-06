@@ -4,16 +4,4 @@ __pycache__/
 *.py[cod]
 .DS_Store
 
-data/raw/*
-data/processed/*
-data/logs/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-!data/logs/.gitkeep
-
-obsidian_output/01_Daily/*
-obsidian_output/02_Weekly/*
-obsidian_output/03_Topics/*
-!obsidian_output/01_Daily/.gitkeep
-!obsidian_output/02_Weekly/.gitkeep
-!obsidian_output/03_Topics/.gitkeep
+family-intelligence-vault/

@@ -1,52 +1,91 @@
-# 家庭全球资讯与投资观察助手
+# Family Intelligence Briefing for Hermes
 
-一个给 Hermes Agent 调用的家庭资讯日报工作流 runner：每天从互联网抓取全球热门资讯、市场信息、科技新闻、地缘风险和家庭生活风险提醒，生成适合普通家庭阅读的中文简报，保存到 Obsidian Vault，并推送到飞书群机器人。
+这是一个 **Hermes-native skill**，用于让 Hermes 定期生成中文家庭全球资讯与投资风险观察简报。
 
-Hermes 是 agent；本项目只负责把固定流程稳定执行完。
+目标不是再造一个 agent。Hermes 已经负责模型、搜索、记忆、定时任务、工具调用和云端常驻；这个仓库只提供：
 
-> 注意：本项目不是投资顾问，也不提供交易指令。输出仅用于信息整理、风险观察和家庭沟通。
+- `SKILL.md`：告诉 Hermes 如何做家庭资讯日报、周报和知识沉淀
+- `send_feishu_text.py`：飞书自定义机器人文本推送小脚本
+- 部署说明：如何把 skill 安装到云端 Hermes
 
-## 功能
+## 用途
 
-- 提供 Hermes skill：`family-intelligence-briefing`
-- 使用 Tavily 搜索配置好的资讯 query
-- 对搜索结果做本地 JSON 存档
-- 基于 URL、标题和正文片段做简单去重
-- 使用 OpenAI-compatible LLM 生成结构化中文日报
-- 自动生成 Obsidian Markdown
-- 从日报生成周报和主题知识沉淀
-- 使用飞书自定义机器人推送摘要
-- 可由 Hermes Cron 定时触发
-- 也保留本地 `schedule` 作为无 Hermes 时的 fallback
-- 日志写入 `data/logs/app.log`
+- 每天给家人推送全球热点、市场风险、科技新闻、地缘风险、生活风险提醒
+- 帮不擅长主动搜索信息的家人打破信息茧房
+- 给你自己沉淀 Markdown / Obsidian 风格知识库
+- 每周整理主题页和资产观察页
 
-## Hermes 用法
+> 投资内容只做信息整理、风险观察和家庭资产提醒，不是交易指令，也不是持牌投资顾问意见。
 
-本仓库包含一个 Hermes skill：
+## 安装 Skill
 
-```text
-skills/research/family-intelligence-briefing/SKILL.md
-```
-
-安装思路：
+在已经安装 Hermes 的服务器上：
 
 ```bash
+git clone https://github.com/MelorTang/family-intelligence-agent.git
+cd family-intelligence-agent
 mkdir -p ~/.hermes/skills/research
 cp -R skills/research/family-intelligence-briefing ~/.hermes/skills/research/
+chmod +x ~/.hermes/skills/research/family-intelligence-briefing/scripts/send_feishu_text.py
 ```
 
-然后在 Hermes 里可以使用：
+然后在 Hermes 中使用：
 
 ```text
 /family-intelligence-briefing 跑一次今天的家庭全球简报
 ```
 
-或让 Hermes 创建 cron：
+## Hermes 配置
+
+模型、搜索和工具不要在本项目里配置，直接使用 Hermes 自己的配置：
+
+```bash
+hermes model
+hermes tools
+hermes config show
+```
+
+skill 的非密钥配置建议放到 Hermes config：
+
+```bash
+hermes config set skills.config.family_intelligence.vault_path ~/family-intelligence-vault
+hermes config set skills.config.family_intelligence.daily_schedule "every 1d at 08:00"
+hermes config set skills.config.family_intelligence.weekly_schedule "every sunday at 20:00"
+hermes config set skills.config.family_intelligence.timezone Asia/Seoul
+hermes config set skills.config.family_intelligence.feishu_enabled true
+```
+
+也可以运行：
+
+```bash
+hermes config migrate
+```
+
+让 Hermes 根据 skill frontmatter 提示你补齐配置。
+
+## 飞书 Webhook
+
+飞书 webhook 和 secret 属于密钥，不要写进 Git。
+
+如果你的 Hermes 环境支持环境变量管理，把它们放到 Hermes 的环境里：
+
+```bash
+export FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/..."
+export FEISHU_SECRET="..."
+```
+
+如果你的 Hermes gateway 是 systemd/服务方式运行，请把这两个变量放到 Hermes 服务实际读取的环境文件中，然后重启 gateway。
+
+如果没有启用飞书签名，`FEISHU_SECRET` 可以为空。
+
+## 创建 Cron
+
+日报：
 
 ```bash
 hermes cron create "every 1d at 08:00" \
-  "Run the family intelligence briefing workflow with: .venv/bin/python main.py run-daily. If it fails, inspect data/logs/app.log and summarize the error." \
-  --workdir /absolute/path/to/family-intelligence-agent \
+  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and publish the short summary to Feishu if configured." \
+  --skill family-intelligence-briefing \
   --name family-daily-briefing
 ```
 
@@ -54,143 +93,42 @@ hermes cron create "every 1d at 08:00" \
 
 ```bash
 hermes cron create "every sunday at 20:00" \
-  "Run the family intelligence weekly knowledge workflow with: .venv/bin/python main.py run-weekly. If it fails, inspect data/logs/app.log and summarize the error." \
-  --workdir /absolute/path/to/family-intelligence-agent \
+  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a weekly family intelligence report and update topic notes in the configured vault path." \
+  --skill family-intelligence-briefing \
   --name family-weekly-knowledge
 ```
 
-如果 Hermes 已经常驻云端，推荐用 Hermes Cron，而不是长期运行 `python main.py schedule`。
-
-## 安装
+检查：
 
 ```bash
-cd family-intelligence-agent
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
+hermes cron list
+hermes cron status
 ```
 
-## 配置方式
+## 知识库结构
 
-Hermes-first 部署时，推荐把密钥和模型配置交给 Hermes 管理。项目里的 `.env.example` 主要是本地测试模板，不是必须长期保存真实密钥。
+Hermes 会按 skill 指引创建：
 
-runner 读取这些通用变量：
-
-```env
-TAVILY_API_KEY=你的 Tavily API Key
-
-LLM_BASE_URL=https://openrouter.ai/api/v1
-LLM_API_KEY=你的模型服务 API Key
-LLM_MODEL=你的模型 ID
-
-FEISHU_WEBHOOK_URL=你的飞书机器人 Webhook
-FEISHU_SECRET=飞书机器人签名密钥，可留空
-
-OBSIDIAN_VAULT_PATH=./obsidian_output
-TIMEZONE=Asia/Seoul
+```text
+~/family-intelligence-vault/
+  01_Daily/
+  02_Weekly/
+  03_Topics/
+  04_Assets/
+  99_Raw/
 ```
 
-兼容旧变量名：`OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL`。
+## 为什么不写独立 Python Runner
 
-## 本地 `.env` 模板
+Hermes 已经支持：
 
-打开 `.env`，填入：
+- 使用任意模型和 provider
+- web/search 工具
+- skills
+- cron
+- gateway
+- memory
+- 文件写入
+- config 和环境变量管理
 
-```env
-TAVILY_API_KEY=你的 Tavily API Key
-
-LLM_BASE_URL=https://openrouter.ai/api/v1
-LLM_API_KEY=你的模型服务 API Key
-LLM_MODEL=你的模型 ID
-
-FEISHU_WEBHOOK_URL=你的飞书机器人 Webhook
-FEISHU_SECRET=飞书机器人签名密钥，可留空
-
-OBSIDIAN_VAULT_PATH=./obsidian_output
-TIMEZONE=Asia/Seoul
-```
-
-`OBSIDIAN_VAULT_PATH` 可以改成你的真实 Obsidian Vault 路径，例如：
-
-```env
-OBSIDIAN_VAULT_PATH=/Users/yourname/Documents/Obsidian/FamilyVault
-```
-
-## 创建飞书机器人 Webhook
-
-1. 打开飞书群。
-2. 进入群设置，选择「机器人」。
-3. 添加「自定义机器人」。
-4. 复制 Webhook 地址到 `FEISHU_WEBHOOK_URL`。
-5. 如果启用了「签名校验」，复制密钥到 `FEISHU_SECRET`。
-6. 第一版发送普通 text 消息，不使用复杂卡片。
-
-## 运行一次日报
-
-```bash
-python main.py run-daily
-```
-
-运行后会生成：
-
-- 原始搜索结果：`data/raw/YYYY-MM-DD.json`
-- 处理后结果：`data/processed/YYYY-MM-DD.json`
-- Obsidian Markdown：`{OBSIDIAN_VAULT_PATH}/01_Daily/YYYY-MM-DD.md`
-- 日志：`data/logs/app.log`
-
-## 启动定时任务
-
-```bash
-python main.py schedule
-```
-
-默认每天 `08:00` 运行一次。时间来自 `config.yaml`：
-
-```yaml
-schedule:
-  daily_time: "08:00"
-```
-
-这个本地定时任务需要进程持续运行。已经部署 Hermes 时，优先使用 Hermes Cron；没有 Hermes 时再使用这个 fallback。
-
-## 云端部署
-
-项目已包含 `Dockerfile` 和 `docker-compose.yml`。如果准备部署到 VPS 或云容器，优先看 [DEPLOYMENT.md](DEPLOYMENT.md)。
-
-推荐第一版让 Hermes Gateway 常驻云端，并用 Hermes Cron 触发 `python main.py run-daily` 和 `python main.py run-weekly`。日报业务逻辑和知识库沉淀逻辑保留在这个 runner 里，Hermes 负责调度、远程控制和失败排查。
-
-## 修改搜索 query
-
-编辑 `config.yaml` 里的 `queries`：
-
-```yaml
-queries:
-  markets:
-    - "US stock market today Fed inflation Treasury yields"
-    - "A股 今日 市场 情绪"
-```
-
-可以按类别增加、删除或替换 query。建议每个类别保留 1-5 条，不要一次放太多，否则成本和运行时间都会上升。
-
-## 命令
-
-```bash
-python main.py run-daily
-python main.py run-weekly
-python main.py schedule
-```
-
-`run-daily` 负责当天飞书推送和日报归档。`run-weekly` 会读取最近 7 天日报，生成 `02_Weekly/YYYY-Www.md`，并更新 `03_Topics` 下的主题页。`schedule` 仅作为没有 Hermes 时的本地 fallback。
-
-## 鲁棒性说明
-
-- 单个 Tavily query 失败不会中断整体任务。
-- LLM JSON 解析失败时会尝试提取 JSON；仍失败则保存原始内容或 fallback Markdown。
-- 飞书推送失败会写日志并在命令行显示失败，不影响本地 Markdown 保存。
-- Obsidian 目录不存在会自动创建。
-- 外部请求设置了 timeout。
-
-## 重要提醒
-
-这份简报只适合做家庭信息同步和风险观察。投资相关内容必须结合自身风险承受能力，并参考专业人士意见。不要因为单条新闻做冲动交易，不要把本工具输出当成确定性预测。
+所以这个项目不再重复实现 Tavily client、LLM client、scheduler、Markdown writer。唯一保留的小脚本是飞书 custom bot webhook，因为这是一个特定平台推送适配。
