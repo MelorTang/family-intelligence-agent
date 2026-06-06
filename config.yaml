@@ -1,0 +1,53 @@
+app:
+  name: "家庭全球资讯与投资观察助手"
+  language: "zh-CN"
+  timezone: "Asia/Seoul"
+
+schedule:
+  daily_time: "08:00"
+  weekly_time: "Sunday 20:00"
+
+search:
+  max_results_per_query: 5
+  search_depth: "basic"
+  include_answer: true
+  include_raw_content: false
+
+queries:
+  global:
+    - "world top news today"
+    - "全球 重要 新闻 今天"
+  markets:
+    - "US stock market today Fed inflation Treasury yields"
+    - "A股 今日 市场 情绪"
+    - "港股 今日 市场 科技股"
+    - "gold oil dollar market today"
+  technology:
+    - "AI technology major news today"
+    - "人工智能 重大 新闻 今日"
+  geopolitics:
+    - "geopolitical risk today war oil gold"
+    - "地缘政治 风险 黄金 原油 今日"
+  china:
+    - "中国 经济 政策 今日"
+    - "中国 房地产 就业 消费 今日"
+  family_risk:
+    - "China fraud scam warning today"
+    - "食品安全 医疗 养老 诈骗 最新"
+
+briefing:
+  max_news_items: 12
+  final_top_items: 5
+  target_length_min: 1000
+  target_length_max: 1800
+  include_sources: true
+  include_investment_section: true
+  include_family_action_section: true
+
+investment:
+  risk_levels:
+    - "🟢 可继续关注"
+    - "🟡 谨慎观察"
+    - "🟠 风险升高"
+    - "🔴 不建议追高"
+    - "⚫ 暂时回避"
