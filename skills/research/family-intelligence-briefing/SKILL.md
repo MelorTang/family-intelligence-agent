@@ -128,18 +128,59 @@ Use Markdown files. Do not require a database for MVP.
 When running the daily briefing:
 
 1. Use Hermes web/search tools to research these categories:
-   - 全球重要新闻：world top news today、全球 重要 新闻 今天
-   - 市场：US stock market Fed inflation Treasury yields、A股 今日 市场 情绪、港股 科技股、gold oil dollar market
-   - 科技：AI technology major news today、人工智能 重大 新闻
-   - 地缘：geopolitical risk war oil gold、地缘政治 风险 黄金 原油
-   - 中国：经济 政策 房地产 就业 消费
-   - 家庭风险：诈骗、食品安全、医疗、养老、消费陷阱
+   - 全球大事：world top news today、全球 重要 新闻 今天
+   - 市场与投资：US stock market Fed inflation Treasury yields、A股 今日 市场 情绪、港股 科技股、gold oil dollar market
+   - 科技与 AI：AI technology major news today、人工智能 重大 新闻
+   - 中国经济与政策：中国 经济 政策 房地产 就业 消费
+   - 家庭生活风险：诈骗、食品安全、医疗、养老、消费陷阱、天气灾害、药品召回、产品召回、个人信息泄露、AI诈骗
 2. Prefer diverse, traceable sources. Keep URLs.
 3. Deduplicate semantically in reasoning: same event from multiple sources should become one item with multiple sources.
 4. Produce a family-readable Chinese report.
 5. Save full Markdown to `{vault_path}/01_Daily/YYYY-MM-DD.md`.
-6. Save raw links and brief source notes to `{vault_path}/99_Raw/YYYY-MM-DD.md` when useful.
+6. Always save a source ledger to `{vault_path}/99_Raw/YYYY-MM-DD.md`.
 7. Return a shorter summary to the active Feishu/Lark chat when invoked from Feishu. For scheduled runs, deliver the summary through Hermes cron's configured delivery/home chat behavior.
+
+Use these source standards:
+
+- High-impact claims must have direct URLs in the source ledger.
+- Prefer primary or high-trust sources for official data: government agencies, central banks, exchanges, regulators, company newsroom/filings, AP/Reuters/Bloomberg/BBC/CNBC/WSJ/FT and comparable outlets.
+- If only low-trust or indirect sources are available, label the item "未确认" and keep it out of the family action section.
+- Do not cite only outlet names such as "Reuters" or "BBC"; save the article title and URL.
+- If exact prices, index levels, casualties, policy dates, or executive visits are included, they must be traceable to a source URL from this run.
+
+Source ledger format:
+
+```markdown
+---
+date: YYYY-MM-DD
+type: source_ledger
+source: hermes
+---
+
+# 今日检索与来源记录
+
+## 使用过的查询
+- 查询词｜用途
+
+## 采用的来源
+| 板块 | 标题 | 来源 | URL | 用途 | 可信度 |
+|---|---|---|---|---|---|
+
+## 放弃或降权的来源
+| 标题 | URL | 原因 |
+|---|---|---|
+
+## 信息缺口
+- 哪个板块证据不足
+- 是否需要增加固定来源/API/skill
+```
+
+For the family risk section, avoid generic advice. Each item should answer:
+
+- 今日具体风险是什么？
+- 谁最容易受影响？
+- 家里今天要做什么？
+- 如何判断真假或降低损失？
 
 Daily Markdown format:
 
@@ -193,7 +234,7 @@ Use this exact structure for the final family-facing chat message. Keep headings
 ……
 
 ━━━━━━━━━━━━━━
-🔥 今日最重要的 5 件事
+🌍 一、全球大事
 
 1️⃣ 标题
 发生了什么：……
@@ -205,23 +246,20 @@ Use this exact structure for the final family-facing chat message. Keep headings
 对家里的影响：……
 不确定性：……
 
-3️⃣ 标题
-发生了什么：……
-对家里的影响：……
-不确定性：……
-
-4️⃣ 标题
-发生了什么：……
-对家里的影响：……
-不确定性：……
-
-5️⃣ 标题
-发生了什么：……
-对家里的影响：……
-不确定性：……
-
 ━━━━━━━━━━━━━━
-📊 今日投资温度
+💰 二、市场与投资
+
+1️⃣ 标题
+发生了什么：……
+对家里的影响：……
+不确定性：……
+
+2️⃣ 标题
+发生了什么：……
+对家里的影响：……
+不确定性：……
+
+今日投资温度：
 • 美股：偏强/中性/偏弱/不确定｜一句话原因
 • A股：偏强/中性/偏弱/不确定｜一句话原因
 • 港股：偏强/中性/偏弱/不确定｜一句话原因
@@ -230,7 +268,53 @@ Use this exact structure for the final family-facing chat message. Keep headings
 • 原油：偏强/中性/偏弱/不确定｜一句话原因
 
 ━━━━━━━━━━━━━━
-👨‍👩‍👧 给家人的提醒
+🤖 三、科技与 AI
+
+1️⃣ 标题
+发生了什么：……
+对家里的影响：……
+需要留意：……
+
+2️⃣ 标题
+发生了什么：……
+对家里的影响：……
+需要留意：……
+
+━━━━━━━━━━━━━━
+🇨🇳 四、中国经济与政策
+
+1️⃣ 标题
+发生了什么：……
+对家里的影响：……
+需要留意：……
+
+2️⃣ 标题
+发生了什么：……
+对家里的影响：……
+需要留意：……
+
+━━━━━━━━━━━━━━
+🛡️ 五、家庭生活风险雷达
+
+1️⃣ 具体风险
+谁容易受影响：……
+家里今天怎么做：……
+判断方法：……
+
+2️⃣ 具体风险
+谁容易受影响：……
+家里今天怎么做：……
+判断方法：……
+
+3️⃣ 具体风险
+谁容易受影响：……
+家里今天怎么做：……
+判断方法：……
+
+━━━━━━━━━━━━━━
+✅ 六、今日行动建议
+
+今天建议：
 1. ……
 2. ……
 3. ……
@@ -239,8 +323,10 @@ Use this exact structure for the final family-facing chat message. Keep headings
 ✅/⚠️ ……
 
 📁 完整报告：~/family-intelligence-vault/01_Daily/YYYY-MM-DD.md
+🔎 来源记录：~/family-intelligence-vault/99_Raw/YYYY-MM-DD.md
 ⚠️ 仅供信息整理与风险观察，不构成投资建议。
 ```
+
 
 Rules for this chat summary:
 
@@ -248,10 +334,11 @@ Rules for this chat summary:
 - Do not include raw Markdown frontmatter in Feishu.
 - Do not include `CronJob Response`, tool call logs, search query lists, or internal execution details.
 - A short progress message before the final report is acceptable, but the final report must use the template above.
-- Keep the final chat message under 3000 Chinese characters.
-- Use no more than 5 emoji types in the final message to keep it readable.
+- Keep the final chat message under 4500 Chinese characters unless the platform truncates messages.
+- Use no more than 8 emoji types in the final message to keep it readable.
 - Every top item must be traceable to sources saved in the full Markdown report.
 - Avoid exact price/index numbers unless they were verified by a current source during this run.
+- Family risk items must be specific and actionable. Avoid generic reminders like "警惕诈骗" unless paired with a concrete scenario and action.
 
 ## Weekly Workflow
 
