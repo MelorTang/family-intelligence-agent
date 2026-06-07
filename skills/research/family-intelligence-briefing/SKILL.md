@@ -214,7 +214,17 @@ source: hermes
 - 美元：
 - 原油：
 
+## 今日资产快照
+| 资产 | 最新状态 | 日/周变化 | 趋势 | 家庭含义 |
+|---|---|---|---|---|
+
 ## 投资观察
+
+## 值得继续跟踪的主题
+| 主题 | 跟踪原因 | 优先级 |
+|---|---|---|
+
+## 未来观察清单
 
 ## 给家人的提醒
 
@@ -266,6 +276,16 @@ Use this exact structure for the final family-facing chat message. Keep headings
 • 黄金：偏强/中性/偏弱/不确定｜一句话原因
 • 美元：偏强/中性/偏弱/不确定｜一句话原因
 • 原油：偏强/中性/偏弱/不确定｜一句话原因
+
+资产快照：
+• 标普500：涨/跌/持平｜一句话
+• 纳斯达克：涨/跌/持平｜一句话
+• 上证综指：涨/跌/持平｜一句话
+• 恒生指数：涨/跌/持平｜一句话
+• 黄金：涨/跌/持平｜一句话
+• WTI原油：涨/跌/持平｜一句话
+• 美元指数：涨/跌/持平｜一句话
+• 比特币：涨/跌/持平｜一句话
 
 ━━━━━━━━━━━━━━
 🤖 三、科技与 AI
@@ -322,6 +342,16 @@ Use this exact structure for the final family-facing chat message. Keep headings
 今日是否需要行动：
 ✅/⚠️ ……
 
+继续跟踪：
+• 主题｜原因｜优先级
+• 主题｜原因｜优先级
+• 主题｜原因｜优先级
+
+未来观察：
+1. 日期/事件：为什么要看
+2. 日期/事件：为什么要看
+3. 日期/事件：为什么要看
+
 📁 完整报告：~/family-intelligence-vault/01_Daily/YYYY-MM-DD.md
 🔎 来源记录：~/family-intelligence-vault/99_Raw/YYYY-MM-DD.md
 ⚠️ 仅供信息整理与风险观察，不构成投资建议。
@@ -339,6 +369,8 @@ Rules for this chat summary:
 - Every top item must be traceable to sources saved in the full Markdown report.
 - Avoid exact price/index numbers unless they were verified by a current source during this run.
 - Family risk items must be specific and actionable. Avoid generic reminders like "警惕诈骗" unless paired with a concrete scenario and action.
+- Include an asset snapshot in every daily report. If exact numbers are not verified, use directional wording such as "偏强/偏弱/震荡/不确定" instead of fabricated figures.
+- Include 3-6 continuing themes and 3-6 future watch items in every daily report when enough sources exist. These should help the family know what to keep watching next, not predict outcomes.
 
 ## Weekly Workflow
 
