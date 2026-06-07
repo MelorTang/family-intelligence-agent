@@ -88,7 +88,7 @@ ls -la ~/family-intelligence-vault
 
 ```bash
 hermes cron create "0 8 * * *" \
-  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and deliver a concise family summary back to the Feishu/Lark home chat." \
+  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path. Deliver the final Feishu/Lark summary using the exact template defined in the skill, without raw Markdown, tool logs, or CronJob Response text." \
   --skill family-intelligence-briefing \
   --deliver feishu \
   --name family-daily-briefing

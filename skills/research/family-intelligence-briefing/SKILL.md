@@ -106,6 +106,7 @@ Always follow these constraints:
 7. 每条重大信息都说明：发生了什么、为什么重要、对普通家庭有什么影响。
 8. 最后给出“今天是否需要行动”的家庭结论。
 9. 明确这不是持牌投资顾问意见。
+10. Do not state high-impact claims as facts unless at least one reliable source supports them. If a claim is unverified, write "未确认" or omit it from the family-facing summary.
 
 ## Knowledge Base Layout
 
@@ -183,15 +184,74 @@ source: hermes
 
 When replying in Feishu/Lark, keep the message concise and family-readable.
 
-The chat summary should contain:
+Use this exact structure for the final family-facing chat message. Keep headings, order, and section names stable between runs.
 
-- 标题和日期
-- 一句话总结
-- 今日最重要的 5 件事
-- 今日投资温度
-- 给家人的提醒
+```text
+📰 今日家庭全球简报｜YYYY-MM-DD
 
-Keep the chat message under 3000 Chinese characters unless the user explicitly asks for the full report. The full report should live in the Markdown knowledge base.
+一句话总结：
+……
+
+━━━━━━━━━━━━━━
+🔥 今日最重要的 5 件事
+
+1️⃣ 标题
+发生了什么：……
+对家里的影响：……
+不确定性：……
+
+2️⃣ 标题
+发生了什么：……
+对家里的影响：……
+不确定性：……
+
+3️⃣ 标题
+发生了什么：……
+对家里的影响：……
+不确定性：……
+
+4️⃣ 标题
+发生了什么：……
+对家里的影响：……
+不确定性：……
+
+5️⃣ 标题
+发生了什么：……
+对家里的影响：……
+不确定性：……
+
+━━━━━━━━━━━━━━
+📊 今日投资温度
+• 美股：偏强/中性/偏弱/不确定｜一句话原因
+• A股：偏强/中性/偏弱/不确定｜一句话原因
+• 港股：偏强/中性/偏弱/不确定｜一句话原因
+• 黄金：偏强/中性/偏弱/不确定｜一句话原因
+• 美元：偏强/中性/偏弱/不确定｜一句话原因
+• 原油：偏强/中性/偏弱/不确定｜一句话原因
+
+━━━━━━━━━━━━━━
+👨‍👩‍👧 给家人的提醒
+1. ……
+2. ……
+3. ……
+
+今日是否需要行动：
+✅/⚠️ ……
+
+📁 完整报告：~/family-intelligence-vault/01_Daily/YYYY-MM-DD.md
+⚠️ 仅供信息整理与风险观察，不构成投资建议。
+```
+
+Rules for this chat summary:
+
+- Do not send the full Markdown report to Feishu unless the user explicitly asks.
+- Do not include raw Markdown frontmatter in Feishu.
+- Do not include `CronJob Response`, tool call logs, search query lists, or internal execution details.
+- A short progress message before the final report is acceptable, but the final report must use the template above.
+- Keep the final chat message under 3000 Chinese characters.
+- Use no more than 5 emoji types in the final message to keep it readable.
+- Every top item must be traceable to sources saved in the full Markdown report.
+- Avoid exact price/index numbers unless they were verified by a current source during this run.
 
 ## Weekly Workflow
 
@@ -239,7 +299,7 @@ Daily:
 
 ```bash
 hermes cron create "0 8 * * *" \
-  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path and deliver a concise family summary back to the Feishu/Lark home chat." \
+  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path. Deliver the final Feishu/Lark summary using the exact template defined in the skill, without raw Markdown, tool logs, or CronJob Response text." \
   --skill family-intelligence-briefing \
   --deliver feishu \
   --name family-daily-briefing
