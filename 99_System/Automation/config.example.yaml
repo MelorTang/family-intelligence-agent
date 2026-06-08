@@ -1,0 +1,29 @@
+vault_path: "/home/ubuntu/family-intelligence-vault"
+timezone: "Asia/Shanghai"
+
+git:
+  branch: "main"
+  remote: "origin"
+  allowed_add_paths:
+    - "00_Inbox/Hermes/"
+    - "00_Inbox/AI_Processed/To_Review/"
+    - "05_Output/Daily_Briefings/"
+    - "05_Output/Weekly_Reviews/"
+    - "99_System/Automation/logs/"
+
+hermes:
+  enabled: true
+  news_enabled: true
+  captures_enabled: true
+  daily_briefing_enabled: true
+  weekly_review_enabled: true
+
+ai_processing:
+  enabled: false
+  provider: ""
+  model: ""
+  output_dir: "00_Inbox/AI_Processed/To_Review/"
+
+logging:
+  log_dir: "99_System/Automation/logs/"
+  level: "INFO"

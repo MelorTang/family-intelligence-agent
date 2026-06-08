@@ -51,7 +51,7 @@ skill 的非密钥配置建议放到 Hermes config：
 hermes config set skills.config.family_intelligence.vault_path ~/family-intelligence-vault
 hermes config set skills.config.family_intelligence.daily_schedule "0 8 * * *"
 hermes config set skills.config.family_intelligence.weekly_schedule "0 20 * * 0"
-hermes config set skills.config.family_intelligence.timezone Asia/Seoul
+hermes config set skills.config.family_intelligence.timezone Asia/Shanghai
 ```
 
 也可以运行：
@@ -102,11 +102,11 @@ hermes cron create "0 8 * * *" \
   --name family-daily-briefing
 ```
 
-周报和知识沉淀：
+周报：
 
 ```bash
 hermes cron create "0 20 * * 0" \
-  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a weekly family intelligence report and update topic notes in the configured vault path." \
+  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a review-pending weekly review. Save it to 05_Output/Weekly_Reviews. Do not update long-term topic, asset, graph, project, report, or article notes." \
   --skill family-intelligence-briefing \
   --deliver feishu \
   --name family-weekly-knowledge
@@ -133,11 +133,19 @@ Hermes 会按 skill 指引创建：
 
 ```text
 ~/family-intelligence-vault/
-  01_Daily/
-  02_Weekly/
-  03_Topics/
-  04_Assets/
-  99_Raw/
+  00_Inbox/
+    Hermes/
+      News/
+      Captures/
+      Logs/
+    AI_Processed/
+      To_Review/
+  05_Output/
+    Daily_Briefings/
+    Weekly_Reviews/
+  99_System/
+    Automation/
+      logs/
 ```
 
 ## 飞书日报格式
@@ -223,12 +231,12 @@ Hermes 会按 skill 指引创建：
 2. 日期/事件：为什么要看
 3. 日期/事件：为什么要看
 
-📁 完整报告：~/family-intelligence-vault/01_Daily/YYYY-MM-DD.md
-🔎 来源记录：~/family-intelligence-vault/99_Raw/YYYY-MM-DD.md
+📁 完整简报：~/family-intelligence-vault/05_Output/Daily_Briefings/YYYY-MM-DD-briefing.md
+🔎 来源材料：~/family-intelligence-vault/00_Inbox/Hermes/News/YYYY-MM-DD-news.md
 ⚠️ 仅供信息整理与风险观察，不构成投资建议。
 ```
 
-完整来源和更长分析保存在 Markdown 知识库里，不直接刷屏到家庭群。`99_Raw` 会保存查询、采用来源、放弃来源和信息缺口，便于判断后续是否需要接入更多 API 或 skill。
+完整来源和更长分析保存在 Markdown 知识库里，不直接刷屏到家庭群。日报和周报有长期复盘价值，但由云端生成时仍保持 `review: pending`，长期概念、项目、图谱、报告和文章由本地 Obsidian 人工沉淀。
 
 ## 为什么不写独立 Python Runner
 

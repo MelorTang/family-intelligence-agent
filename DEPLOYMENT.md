@@ -33,7 +33,7 @@ hermes config show
 hermes config set skills.config.family_intelligence.vault_path ~/family-intelligence-vault
 hermes config set skills.config.family_intelligence.daily_schedule "0 8 * * *"
 hermes config set skills.config.family_intelligence.weekly_schedule "0 20 * * 0"
-hermes config set skills.config.family_intelligence.timezone Asia/Seoul
+hermes config set skills.config.family_intelligence.timezone Asia/Shanghai
 ```
 
 ## 4. 配置飞书应用机器人
@@ -98,7 +98,7 @@ hermes cron create "0 8 * * *" \
 
 ```bash
 hermes cron create "0 20 * * 0" \
-  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a weekly family intelligence report and update topic notes in the configured vault path." \
+  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a review-pending weekly review. Save it to 05_Output/Weekly_Reviews. Do not update long-term topic, asset, graph, project, report, or article notes." \
   --skill family-intelligence-briefing \
   --deliver feishu \
   --name family-weekly-knowledge

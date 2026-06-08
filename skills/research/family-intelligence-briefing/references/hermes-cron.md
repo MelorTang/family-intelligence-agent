@@ -19,11 +19,11 @@ hermes cron create "0 8 * * *" \
   --name family-daily-briefing
 ```
 
-Weekly consolidation:
+Weekly review:
 
 ```bash
 hermes cron create "0 20 * * 0" \
-  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a weekly family intelligence report and update topic notes in the configured vault path." \
+  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a review-pending weekly review. Save it to 05_Output/Weekly_Reviews. Do not update long-term topic, asset, graph, project, report, or article notes." \
   --skill family-intelligence-briefing \
   --deliver feishu \
   --name family-weekly-knowledge
