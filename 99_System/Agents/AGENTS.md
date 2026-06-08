@@ -24,8 +24,8 @@
 10. 不把 AI 生成内容标记为 `verified`。
 11. 回答用户问题时，如果依据 `review: pending` 内容，必须明确标注“未人工审核”。
 12. 不联网补充事实，除非用户明确要求；默认优先基于本 vault 内容回答。
-13. 默认不要提议写入 Protected Paths。只有用户明确要求“更新长期笔记/主题笔记/图谱/报告/文章”时，才可以提出这类修改计划。
-14. 对 Hermes 生成的内容，默认处理方式是总结、标注问题、生成待审核建议，而不是直接拆入长期知识库。
+13. 默认使用 Query 或 Review 模式；只有用户明确批准 Curate 模式时，CLI agent 才可以修改长期知识库。
+14. 对 Hermes 生成的内容，默认处理方式是总结、标注问题、生成待审核建议；经用户明确批准后，可以把候选内容整理进长期笔记。
 
 # Allowed Cloud Write Paths
 
@@ -53,11 +53,62 @@ MOC files
 long-term concept notes
 ```
 
+Protected Paths are protected from unattended automation and unapproved edits. They are not forbidden forever. In Curate mode, a local CLI agent may update them after explicit user approval.
+
 # Agent Usage
 
 Hermes handles light unattended tasks: collection, summarization, candidate links, candidate concepts, daily briefings, and weekly reviews.
 
 Claude Code, Codex, Antigravity, or other CLI agents should be used for heavier maintenance only when manually triggered.
+
+# Agent Modes
+
+## Query Mode
+
+Read-only. Use this when the user asks questions such as "查一下", "总结", "有没有记录过", or "根据我的知识库回答".
+
+Rules:
+
+- Do not modify files.
+- Prefer vault content over web search.
+- If using `review: pending` material, label it as 未人工审核.
+- Cite source file paths.
+
+## Review Mode
+
+Non-destructive planning. Use this when the user asks to review Inbox, Daily Briefings, Weekly Reviews, or Hermes output.
+
+Allowed outputs:
+
+```text
+00_Inbox/AI_Processed/To_Review/YYYY-MM-DD-ai-review.md
+05_Output/Weekly_Reviews/YYYY-Www.md
+```
+
+Rules:
+
+- Produce candidate concepts, candidate projects, suggested links, questions, and warnings.
+- Do not directly edit Protected Paths.
+- Do not create legacy files such as `01_Daily/YYYY-MM-DD.md` or `99_Raw/YYYY-MM-DD.md` unless the user explicitly asks to preserve the old archive format.
+
+## Curate Mode
+
+Approved knowledge-base editing. Use this only after the user clearly approves a concrete plan or explicitly asks to update long-term notes.
+
+Allowed actions after approval:
+
+- Append reviewed sections to existing topic/concept/project notes.
+- Create new Source Notes, Concept Notes, Project Notes, or Reports.
+- Add links between notes.
+- Mark uncertain facts as `TODO_VERIFY`.
+
+Rules:
+
+- Do not delete, rename, merge, or rewrite long-term notes unless explicitly authorized.
+- Preserve source links or source note references for every material claim.
+- Do not mark AI-generated or unverified content as `verified`.
+- Prefer appending dated sections over rewriting existing notes.
+- After edits, show `git diff` and a concise change summary. Do not commit unless the user explicitly asks.
 
 Before making changes, run or ask the user to run:
 
@@ -74,19 +125,6 @@ git status
 ```
 
 Only commit explicitly reviewed files. Do not use `git add .` for broad vault changes unless the user explicitly approves.
-
-# Default Review Output
-
-When asked to review Hermes inbox material, produce a review plan first. By default, recommend one of these non-destructive outputs:
-
-```text
-00_Inbox/AI_Processed/To_Review/YYYY-MM-DD-ai-review.md
-05_Output/Weekly_Reviews/YYYY-Www.md
-```
-
-Do not suggest creating legacy files such as `01_Daily/YYYY-MM-DD.md` or `99_Raw/YYYY-MM-DD.md` unless the user explicitly asks to preserve the old archive format.
-
-Do not suggest appending to existing topic notes in `03_Topics/` or long-term notes in `04_LLM_Wiki/` by default. Instead, list candidate updates for human review.
 
 # Local Agent Entry Prompt
 
