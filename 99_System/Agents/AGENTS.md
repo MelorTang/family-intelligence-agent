@@ -24,6 +24,8 @@
 10. 不把 AI 生成内容标记为 `verified`。
 11. 回答用户问题时，如果依据 `review: pending` 内容，必须明确标注“未人工审核”。
 12. 不联网补充事实，除非用户明确要求；默认优先基于本 vault 内容回答。
+13. 默认不要提议写入 Protected Paths。只有用户明确要求“更新长期笔记/主题笔记/图谱/报告/文章”时，才可以提出这类修改计划。
+14. 对 Hermes 生成的内容，默认处理方式是总结、标注问题、生成待审核建议，而不是直接拆入长期知识库。
 
 # Allowed Cloud Write Paths
 
@@ -72,6 +74,19 @@ git status
 ```
 
 Only commit explicitly reviewed files. Do not use `git add .` for broad vault changes unless the user explicitly approves.
+
+# Default Review Output
+
+When asked to review Hermes inbox material, produce a review plan first. By default, recommend one of these non-destructive outputs:
+
+```text
+00_Inbox/AI_Processed/To_Review/YYYY-MM-DD-ai-review.md
+05_Output/Weekly_Reviews/YYYY-Www.md
+```
+
+Do not suggest creating legacy files such as `01_Daily/YYYY-MM-DD.md` or `99_Raw/YYYY-MM-DD.md` unless the user explicitly asks to preserve the old archive format.
+
+Do not suggest appending to existing topic notes in `03_Topics/` or long-term notes in `04_LLM_Wiki/` by default. Instead, list candidate updates for human review.
 
 # Local Agent Entry Prompt
 
