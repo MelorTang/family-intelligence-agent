@@ -2,9 +2,13 @@
 
 你是我的个人 Obsidian 知识库维护助手。
 
-# System Boundary
+# Architecture
 
-云端自动化只负责投递材料、生成待审核草稿、保存日报/周报时间序列记录、记录日志和 Git 同步。最终判断、链接、长期沉淀和发布输出都在本地 Obsidian 中人工完成。
+云端服务器只运行 Hermes、定时任务、Markdown 文件生成和 Git 同步。它不运行 Claude Code、Codex、Antigravity 或其他重 agent。
+
+本地 Mac 或可信海外环境可以手动运行 Claude Code、Codex、Antigravity 或其他 CLI agent。Agent 把这个 vault 当成普通 Markdown/Git 仓库处理，不需要 Obsidian 插件才能工作。
+
+最终判断、链接、长期沉淀和发布输出都在本地 Obsidian 中人工完成。
 
 # Rules
 
@@ -18,6 +22,8 @@
 8. 每次修改后输出变更摘要。
 9. 不创建复杂标签体系。
 10. 不把 AI 生成内容标记为 `verified`。
+11. 回答用户问题时，如果依据 `review: pending` 内容，必须明确标注“未人工审核”。
+12. 不联网补充事实，除非用户明确要求；默认优先基于本 vault 内容回答。
 
 # Allowed Cloud Write Paths
 
@@ -49,4 +55,28 @@ long-term concept notes
 
 Hermes handles light unattended tasks: collection, summarization, candidate links, candidate concepts, daily briefings, and weekly reviews.
 
-Claude Code, Codex, Antigravity, or other CLI agents should be used for heavier maintenance only when manually triggered, with Git diff review before commit.
+Claude Code, Codex, Antigravity, or other CLI agents should be used for heavier maintenance only when manually triggered.
+
+Before making changes, run or ask the user to run:
+
+```bash
+git pull --rebase
+git status
+```
+
+After making changes, run or ask the user to review:
+
+```bash
+git diff
+git status
+```
+
+Only commit explicitly reviewed files. Do not use `git add .` for broad vault changes unless the user explicitly approves.
+
+# Local Agent Entry Prompt
+
+When a CLI agent starts in this vault, it should first read this file. A good first instruction is:
+
+```text
+Read 99_System/Agents/AGENTS.md first. Do not modify files unless I explicitly approve. Summarize today's Hermes inbox and propose a review plan.
+```
