@@ -29,14 +29,15 @@ Start with the daily briefing, then inspect source material only where needed.
 For valuable material, manually create or update:
 
 ```text
-01_Projects/
-02_Areas/
-03_Resources/
-04_LLM_Wiki/
+01_Journal/
+02_Sources/
+03_Knowledge/
+04_Insights/
 05_Output/Reports/
 05_Output/Articles/
+05_Output/Memos/
 06_Graph/
-07_Daily/
+07_Assets/
 ```
 
 Daily briefings and weekly reviews can be retained as useful historical records. Do not promote AI-generated or Hermes-generated claims into long-term knowledge without verification.

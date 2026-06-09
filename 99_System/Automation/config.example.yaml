@@ -10,6 +10,17 @@ git:
     - "05_Output/Daily_Briefings/"
     - "05_Output/Weekly_Reviews/"
     - "99_System/Automation/logs/"
+  protected_paths:
+    - "01_Journal/"
+    - "02_Sources/"
+    - "03_Knowledge/"
+    - "04_Insights/"
+    - "05_Output/Reports/"
+    - "05_Output/Articles/"
+    - "05_Output/Memos/"
+    - "06_Graph/"
+    - "07_Assets/"
+    - "90_Archive/"
 
 hermes:
   enabled: true

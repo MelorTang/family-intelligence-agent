@@ -16,7 +16,7 @@
 2. 不删除、合并、重命名长期笔记，除非我明确要求。
 3. 自动生成内容必须标记 `review: pending`。
 4. 不确定内容标记 `TODO_VERIFY`。
-5. 长期知识进入 `04_LLM_Wiki` 前必须经过人工确认。
+5. 长期知识进入 `03_Knowledge` 或 `04_Insights` 前必须经过人工确认。
 6. 云端自动化只写 Inbox、Daily Briefings、Weekly Reviews、To_Review 和 logs。
 7. 每次批量修改前先说明计划。
 8. 每次修改后输出变更摘要。
@@ -40,14 +40,16 @@
 # Protected Paths
 
 ```text
-01_Projects/
-02_Areas/
-03_Resources/
-04_LLM_Wiki/
+01_Journal/
+02_Sources/
+03_Knowledge/
+04_Insights/
 06_Graph/
-07_Daily/
+07_Assets/
+90_Archive/
 05_Output/Reports/
 05_Output/Articles/
+05_Output/Memos/
 Home.md
 MOC files
 long-term concept notes
@@ -98,7 +100,7 @@ Approved knowledge-base editing. Use this only after the user clearly approves a
 Allowed actions after approval:
 
 - Append reviewed sections to existing topic/concept/project notes.
-- Create new Source Notes, Concept Notes, Project Notes, or Reports.
+- Create new Source Notes, Concept Notes, Insight Notes, Reports, Articles, or Memos.
 - Add links between notes.
 - Mark uncertain facts as `TODO_VERIFY`.
 
@@ -131,5 +133,5 @@ Only commit explicitly reviewed files. Do not use `git add .` for broad vault ch
 When a CLI agent starts in this vault, it should first read this file. A good first instruction is:
 
 ```text
-Read 99_System/Agents/AGENTS.md first. Do not modify files unless I explicitly approve. Summarize today's Hermes inbox and propose a review plan.
+Read 99_System/Agents/AGENTS.md first. Do not modify files unless I explicitly approve. Summarize today's Hermes inbox and propose a review plan using Query or Review Mode.
 ```

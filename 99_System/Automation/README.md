@@ -10,6 +10,12 @@ GitHub       -> version history and sync
 Obsidian     -> human review, links, durable knowledge, outputs
 ```
 
+The local knowledge flow is:
+
+```text
+Capture -> Source -> Concept -> Insight -> Output
+```
+
 ## Cloud Write Boundary
 
 Cloud automation may write only:
@@ -27,14 +33,16 @@ Daily briefings and weekly reviews are worth keeping as time-series records. The
 Cloud automation must not modify:
 
 ```text
-01_Projects/
-02_Areas/
-03_Resources/
-04_LLM_Wiki/
+01_Journal/
+02_Sources/
+03_Knowledge/
+04_Insights/
 06_Graph/
-07_Daily/
+07_Assets/
+90_Archive/
 05_Output/Reports/
 05_Output/Articles/
+05_Output/Memos/
 Home.md
 MOC files
 long-term concept notes
@@ -45,7 +53,7 @@ long-term concept notes
 1. Run `git pull` before opening the review session.
 2. Read `05_Output/Daily_Briefings/YYYY-MM-DD-briefing.md`.
 3. Review source material in `00_Inbox/Hermes/News/` and `00_Inbox/Hermes/Captures/`.
-4. Create or update long-term notes manually.
+4. Create or update Source, Concept, Insight, or Output notes manually or through an approved local CLI agent Curate Mode.
 5. Mark reviewed generated files with `review: done`.
 6. Commit and push local changes.
 

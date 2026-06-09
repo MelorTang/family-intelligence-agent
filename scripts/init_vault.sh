@@ -65,24 +65,49 @@ write_file_if_missing() {
 directories=(
   "00_Inbox/Hermes/News"
   "00_Inbox/Hermes/Captures"
+  "00_Inbox/Hermes/Reading"
+  "00_Inbox/Hermes/Ideas"
+  "00_Inbox/Hermes/Questions"
   "00_Inbox/Hermes/Logs"
   "00_Inbox/AI_Processed/To_Review"
-  "01_Projects"
-  "02_Areas"
-  "03_Resources"
-  "04_LLM_Wiki/Concepts"
-  "04_LLM_Wiki/People"
-  "04_LLM_Wiki/Companies"
-  "04_LLM_Wiki/Tools"
-  "04_LLM_Wiki/Industries"
-  "04_LLM_Wiki/Frameworks"
+  "01_Journal/Daily"
+  "01_Journal/Weekly"
+  "02_Sources/Articles"
+  "02_Sources/Books"
+  "02_Sources/Papers"
+  "02_Sources/Web"
+  "02_Sources/People"
+  "02_Sources/Companies"
+  "03_Knowledge/MOC"
+  "03_Knowledge/Concepts"
+  "03_Knowledge/Domains/AI"
+  "03_Knowledge/Domains/Investment"
+  "03_Knowledge/Domains/Industry_Research"
+  "03_Knowledge/Domains/Knowledge_Management"
+  "03_Knowledge/Domains/Business"
+  "03_Knowledge/Domains/Career"
+  "03_Knowledge/Domains/Life"
+  "03_Knowledge/Markets"
+  "03_Knowledge/Tools"
+  "03_Knowledge/Frameworks"
+  "04_Insights/Investment_Theses"
+  "04_Insights/Mental_Models"
+  "04_Insights/Decision_Notes"
+  "04_Insights/Questions"
   "05_Output/Daily_Briefings"
   "05_Output/Weekly_Reviews"
   "05_Output/Reports"
   "05_Output/Articles"
+  "05_Output/Memos"
   "06_Graph"
-  "07_Daily"
-  "90_Archive"
+  "07_Assets/Files"
+  "07_Assets/Images"
+  "07_Assets/PDFs"
+  "90_Archive/Hermes_Legacy/01_Daily"
+  "90_Archive/Hermes_Legacy/02_Weekly"
+  "90_Archive/Hermes_Legacy/03_Topics"
+  "90_Archive/Hermes_Legacy/04_Assets"
+  "90_Archive/Hermes_Legacy/99_Raw"
   "99_System/Agents"
   "99_System/Templates"
   "99_System/Prompts"
@@ -108,7 +133,21 @@ This root file exists because some CLI agents automatically look for \`AGENTS.md
 
 write_file_if_missing "$VAULT_PATH/README.md" "# Personal Knowledge Vault
 
-This vault is synchronized through GitHub. Cloud automation may only write inbox, daily briefing, AI review, and automation log directories. Long-term notes are curated locally in Obsidian."
+This vault is synchronized through GitHub. Cloud automation may only write Inbox, Daily Briefings, Weekly Reviews, AI review drafts, and automation logs.
+
+The vault is organized around a personal knowledge flow:
+
+\`\`\`text
+Capture -> Source -> Concept -> Insight -> Output
+\`\`\`
+
+Hermes delivers material. Local Obsidian review and approved local agents turn selected material into long-term knowledge.
+
+Legacy Hermes-generated structures are archived under:
+
+\`\`\`text
+90_Archive/Hermes_Legacy/
+\`\`\`"
 
 write_file_if_missing "$VAULT_PATH/06_Graph/relations.csv" "source,relation,target,type,status,created,created_by,note"
 
@@ -128,6 +167,17 @@ git:
     - \"05_Output/Daily_Briefings/\"
     - \"05_Output/Weekly_Reviews/\"
     - \"99_System/Automation/logs/\"
+  protected_paths:
+    - \"01_Journal/\"
+    - \"02_Sources/\"
+    - \"03_Knowledge/\"
+    - \"04_Insights/\"
+    - \"05_Output/Reports/\"
+    - \"05_Output/Articles/\"
+    - \"05_Output/Memos/\"
+    - \"06_Graph/\"
+    - \"07_Assets/\"
+    - \"90_Archive/\"
 
 hermes:
   enabled: true
@@ -145,6 +195,201 @@ ai_processing:
 logging:
   log_dir: \"99_System/Automation/logs/\"
   level: \"INFO\""
+
+write_file_if_missing "$VAULT_PATH/03_Knowledge/MOC/Home.md" "---
+type: moc
+status: active
+review: done
+created: 2026-06-10
+updated: 2026-06-10
+tags:
+  - moc
+---
+
+# Home MOC
+
+## Core Flows
+
+- Capture: [[00_Inbox]]
+- Sources: [[02_Sources]]
+- Knowledge: [[03_Knowledge]]
+- Insights: [[04_Insights]]
+- Output: [[05_Output]]
+
+## Primary MOCs
+
+- [[AI]]
+- [[Investment]]
+- [[Knowledge_Management]]
+
+## Operating Rule
+
+Hermes delivers material. Local review turns selected material into sources, concepts, insights, and outputs."
+
+write_file_if_missing "$VAULT_PATH/03_Knowledge/MOC/AI.md" "---
+type: moc
+status: active
+review: done
+created: 2026-06-10
+updated: 2026-06-10
+tags:
+  - moc
+  - ai
+---
+
+# AI MOC
+
+## Concepts
+
+- Add durable AI concepts here after review.
+
+## Sources To Process
+
+- Review legacy material in [[90_Archive/Hermes_Legacy/03_Topics/AI]].
+
+## Open Questions
+
+- Which AI developments are durable enough to become concept notes?"
+
+write_file_if_missing "$VAULT_PATH/03_Knowledge/MOC/Investment.md" "---
+type: moc
+status: active
+review: done
+created: 2026-06-10
+updated: 2026-06-10
+tags:
+  - moc
+  - investment
+---
+
+# Investment MOC
+
+## Markets
+
+- Add reviewed market notes in [[03_Knowledge/Markets]].
+
+## Theses
+
+- Add personal investment theses in [[04_Insights/Investment_Theses]].
+
+## Legacy Material
+
+- [[90_Archive/Hermes_Legacy/03_Topics/美股]]
+- [[90_Archive/Hermes_Legacy/03_Topics/A股]]
+- [[90_Archive/Hermes_Legacy/03_Topics/港股]]
+- [[90_Archive/Hermes_Legacy/03_Topics/黄金]]"
+
+write_file_if_missing "$VAULT_PATH/03_Knowledge/MOC/Knowledge_Management.md" "---
+type: moc
+status: active
+review: done
+created: 2026-06-10
+updated: 2026-06-10
+tags:
+  - moc
+  - pkm
+---
+
+# Knowledge Management MOC
+
+## Principles
+
+- Capture first, judge later.
+- Do not promote pending material into long-term knowledge without review.
+- Prefer source -> concept -> insight -> output.
+
+## Workflows
+
+- Daily review starts from [[00_Inbox]] and [[05_Output/Daily_Briefings]].
+- Weekly review creates durable insights only after local judgment."
+
+write_file_if_missing "$VAULT_PATH/99_System/Templates/source_note.md" "---
+type: source
+status: draft
+review: pending
+created:
+updated:
+source:
+tags:
+---
+
+# Source Note
+
+## Summary
+
+## Key Facts
+
+## Quotes / Evidence
+
+## Links
+
+## Follow-up"
+
+write_file_if_missing "$VAULT_PATH/99_System/Templates/concept_note.md" "---
+type: concept
+status: draft
+review: pending
+created:
+updated:
+source:
+tags:
+---
+
+# Concept Note
+
+## Definition
+
+## Why It Matters
+
+## Mechanism
+
+## Related Concepts
+
+## Sources"
+
+write_file_if_missing "$VAULT_PATH/99_System/Templates/insight_note.md" "---
+type: insight
+status: draft
+review: pending
+created:
+updated:
+source:
+tags:
+---
+
+# Insight Note
+
+## Claim
+
+## Reasoning
+
+## Evidence
+
+## Implications
+
+## TODO_VERIFY"
+
+write_file_if_missing "$VAULT_PATH/99_System/Templates/output_note.md" "---
+type: output
+status: draft
+review: pending
+created:
+updated:
+source:
+tags:
+---
+
+# Output Note
+
+## Purpose
+
+## Audience
+
+## Outline
+
+## Draft
+
+## Sources"
 
 write_file_if_missing "$VAULT_PATH/99_System/Agents/AGENTS.md" "# Role
 
@@ -164,7 +409,7 @@ write_file_if_missing "$VAULT_PATH/99_System/Agents/AGENTS.md" "# Role
 2. 不删除、合并、重命名长期笔记，除非我明确要求。
 3. 自动生成内容必须标记 \`review: pending\`。
 4. 不确定内容标记 \`TODO_VERIFY\`。
-5. 长期知识进入 \`04_LLM_Wiki\` 前必须经过人工确认。
+5. 长期知识进入 \`03_Knowledge\` 或 \`04_Insights\` 前必须经过人工确认。
 6. 云端自动化只写 Inbox、Daily Briefings、Weekly Reviews、To_Review 和 logs。
 7. 每次批量修改前先说明计划。
 8. 每次修改后输出变更摘要。
@@ -188,14 +433,16 @@ write_file_if_missing "$VAULT_PATH/99_System/Agents/AGENTS.md" "# Role
 # Protected Paths
 
 \`\`\`text
-01_Projects/
-02_Areas/
-03_Resources/
-04_LLM_Wiki/
+01_Journal/
+02_Sources/
+03_Knowledge/
+04_Insights/
 06_Graph/
-07_Daily/
+07_Assets/
+90_Archive/
 05_Output/Reports/
 05_Output/Articles/
+05_Output/Memos/
 Home.md
 MOC files
 long-term concept notes
@@ -246,7 +493,7 @@ Approved knowledge-base editing. Use this only after the user clearly approves a
 Allowed actions after approval:
 
 - Append reviewed sections to existing topic/concept/project notes.
-- Create new Source Notes, Concept Notes, Project Notes, or Reports.
+- Create new Source Notes, Concept Notes, Insight Notes, Reports, Articles, or Memos.
 - Add links between notes.
 - Mark uncertain facts as \`TODO_VERIFY\`.
 
@@ -279,7 +526,7 @@ Only commit explicitly reviewed files. Do not use \`git add .\` for broad vault 
 When a CLI agent starts in this vault, it should first read this file. A good first instruction is:
 
 \`\`\`text
-Read 99_System/Agents/AGENTS.md first. Do not modify files unless I explicitly approve. Summarize today's Hermes inbox and propose a review plan.
+Read 99_System/Agents/AGENTS.md first. Do not modify files unless I explicitly approve. Summarize today's Hermes inbox and propose a review plan using Query or Review Mode.
 \`\`\`"
 
 write_file_if_missing "$VAULT_PATH/99_System/Claude/CLAUDE.md" "# Claude Code Compatibility Entry

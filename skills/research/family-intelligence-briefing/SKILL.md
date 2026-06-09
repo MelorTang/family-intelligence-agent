@@ -120,28 +120,46 @@ Resolve the configured vault path from `skills.config.family_intelligence.vault_
     Hermes/
       News/
       Captures/
+      Reading/
+      Ideas/
+      Questions/
       Logs/
     AI_Processed/
       To_Review/
-  01_Projects/
-  02_Areas/
-  03_Resources/
-  04_LLM_Wiki/
-    Concepts/
+  01_Journal/
+    Daily/
+    Weekly/
+  02_Sources/
+    Articles/
+    Books/
+    Papers/
+    Web/
     People/
     Companies/
+  03_Knowledge/
+    MOC/
+    Concepts/
+    Domains/
+    Markets/
     Tools/
-    Industries/
     Frameworks/
+  04_Insights/
+    Investment_Theses/
+    Mental_Models/
+    Decision_Notes/
+    Questions/
   05_Output/
     Daily_Briefings/
     Weekly_Reviews/
     Reports/
     Articles/
+    Memos/
   06_Graph/
-  07_Daily/
+  07_Assets/
   90_Archive/
+    Hermes_Legacy/
   99_System/
+    Agents/
     Templates/
     Prompts/
     Hermes/
@@ -167,14 +185,16 @@ Daily briefings and weekly reviews have long-term review value as time-series re
 Cloud Hermes must not write, delete, rename, merge, or reorganize long-term notes in:
 
 ```text
-01_Projects/
-02_Areas/
-03_Resources/
-04_LLM_Wiki/
+01_Journal/
+02_Sources/
+03_Knowledge/
+04_Insights/
 06_Graph/
-07_Daily/
+07_Assets/
+90_Archive/
 05_Output/Reports/
 05_Output/Articles/
+05_Output/Memos/
 Home.md
 MOC files
 long-term concept notes
@@ -424,8 +444,8 @@ When running weekly consolidation:
 
 1. Read the last 7 daily briefing and inbox notes from allowed directories.
 2. Create `{vault_path}/05_Output/Weekly_Reviews/YYYY-Www.md`.
-3. Suggest possible concepts, project notes, links, and follow-up questions for local Obsidian review.
-4. Do not update `04_LLM_Wiki`, graph files, project notes, topic notes, asset notes, reports, or articles.
+3. Suggest possible source notes, concept notes, insight notes, links, and follow-up questions for local Obsidian review.
+4. Do not update `03_Knowledge`, `04_Insights`, graph files, source notes, reports, articles, memos, or archived legacy notes.
 
 Weekly note structure:
 
