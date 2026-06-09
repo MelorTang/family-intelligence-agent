@@ -120,10 +120,10 @@ Resolve the configured vault path from `skills.config.family_intelligence.vault_
     Hermes/
       News/
       Captures/
-      Reading/
-      Ideas/
-      Questions/
       Logs/
+    Reading/
+    Ideas/
+    Questions/
     AI_Processed/
       To_Review/
   01_Journal/
@@ -174,6 +174,9 @@ Cloud Hermes may write only:
 
 ```text
 {vault_path}/00_Inbox/Hermes/
+{vault_path}/00_Inbox/Ideas/
+{vault_path}/00_Inbox/Questions/
+{vault_path}/00_Inbox/Reading/
 {vault_path}/00_Inbox/AI_Processed/To_Review/
 {vault_path}/05_Output/Daily_Briefings/
 {vault_path}/05_Output/Weekly_Reviews/
@@ -201,6 +204,81 @@ long-term concept notes
 ```
 
 Every cloud-generated Markdown file must include YAML frontmatter with `review: pending`. Never mark AI-generated or Hermes-generated content as `verified`.
+
+## Feishu Quick Capture Workflow
+
+Hermes should support quick personal capture from Feishu/Lark so the user does not need to open Obsidian on a computer.
+
+This is a lightweight inbox feature. It may create new Markdown files only in:
+
+```text
+{vault_path}/00_Inbox/Ideas/
+{vault_path}/00_Inbox/Questions/
+{vault_path}/00_Inbox/Reading/
+```
+
+It must not promote captures directly into `02_Sources/`, `03_Knowledge/`, `04_Insights/`, or long-term output folders.
+
+Trigger patterns:
+
+- Idea: `记一个 idea：...`, `记个 idea：...`, `idea: ...`, `灵感：...`, `想法：...`
+- Question: `记一个 question：...`, `question: ...`, `问题：...`, `待研究：...`
+- Reading: `加入 reading：...`, `reading: ...`, `待读：...`, `稍后读：...`
+
+When a quick capture request is received:
+
+1. Classify it as `idea`, `question`, or `reading`.
+2. Create a short stable slug from the message content. Use lowercase ASCII words when obvious; otherwise use a short pinyin-like or date-based slug. Avoid spaces and unsafe filename characters.
+3. Save to:
+   - Ideas: `{vault_path}/00_Inbox/Ideas/YYYY-MM-DD-slug.md`
+   - Questions: `{vault_path}/00_Inbox/Questions/YYYY-MM-DD-slug.md`
+   - Reading: `{vault_path}/00_Inbox/Reading/YYYY-MM-DD-slug.md`
+4. Preserve the user's original wording exactly under `## 原始记录`.
+5. Add a short `## 初步整理` section only if it helps clarify the capture. Do not over-process it.
+6. If the message contains a URL, keep the URL unchanged.
+7. Reply in Feishu with a short confirmation and the saved relative path.
+
+Quick capture Markdown format:
+
+```markdown
+---
+type: capture
+capture_type: idea | question | reading
+source: feishu
+status: inbox
+review: pending
+created_by: hermes
+created: YYYY-MM-DD
+tags:
+  - inbox
+  - capture
+---
+
+# Title
+
+## 原始记录
+
+...
+
+## 初步整理
+
+...
+
+## 后续处理建议
+
+- 是否需要转为 Source Note：
+- 是否需要转为 Concept Note：
+- 是否需要转为 Insight Note：
+```
+
+Feishu confirmation format:
+
+```text
+已记录到 Obsidian Inbox：
+00_Inbox/Ideas/YYYY-MM-DD-slug.md
+
+我只做了快速捕获，后续可在本地 Obsidian 中审核整理。
+```
 
 ## Daily Workflow
 

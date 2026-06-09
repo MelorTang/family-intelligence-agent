@@ -12,6 +12,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ALLOWED_PATHS=(
   "00_Inbox/Hermes/"
+  "00_Inbox/Ideas/"
+  "00_Inbox/Questions/"
+  "00_Inbox/Reading/"
   "00_Inbox/AI_Processed/To_Review/"
   "05_Output/Daily_Briefings/"
   "05_Output/Weekly_Reviews/"
@@ -20,6 +23,9 @@ ALLOWED_PATHS=(
 
 CONTENT_PATHS=(
   "00_Inbox/Hermes/"
+  "00_Inbox/Ideas/"
+  "00_Inbox/Questions/"
+  "00_Inbox/Reading/"
   "00_Inbox/AI_Processed/To_Review/"
   "05_Output/Daily_Briefings/"
   "05_Output/Weekly_Reviews/"
