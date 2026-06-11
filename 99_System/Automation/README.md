@@ -64,13 +64,13 @@ Cloud sync uses `scripts/hermes_git_sync.sh`. It runs:
 ```text
 git fetch
 git pull --rebase
-generate files
+keep only Hermes-written files
 git add allowed paths only
 git commit
 git push
 ```
 
-It never runs `git add .`, `git reset --hard`, force push, or automatic deletes.
+It does not create placeholder daily files by default. Hermes skills should write real content first; the sync script only stages, commits, and pushes allowed paths. It never runs `git add .`, `git reset --hard`, force push, or automatic deletes.
 
 ## Conflict Handling
 

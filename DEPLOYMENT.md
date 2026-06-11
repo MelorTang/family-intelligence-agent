@@ -10,11 +10,18 @@ git clone https://github.com/MelorTang/family-intelligence-agent.git
 cd family-intelligence-agent
 ```
 
-## 2. 安装 Skill
+## 2. 安装 Skills
 
 ```bash
 mkdir -p ~/.hermes/skills/research
-cp -R skills/research/family-intelligence-briefing ~/.hermes/skills/research/
+mkdir -p ~/.hermes/skills/capture
+rm -rf ~/.hermes/skills/research/family-daily-briefing
+rm -rf ~/.hermes/skills/research/family-weekly-review
+rm -rf ~/.hermes/skills/capture/family-quick-capture
+rm -rf ~/.hermes/skills/research/family-intelligence-briefing
+cp -R skills/research/family-daily-briefing ~/.hermes/skills/research/
+cp -R skills/research/family-weekly-review ~/.hermes/skills/research/
+cp -R skills/capture/family-quick-capture ~/.hermes/skills/capture/
 ```
 
 ## 3. 配置 Hermes
@@ -66,14 +73,14 @@ hermes gateway status
 
 - 在飞书里私聊机器人，发送 `/status`
 - 在家庭群里 @ 机器人，发送 `/whoami`
-- 在飞书里发送 `/family-intelligence-briefing 跑一次今天的家庭全球简报`
+- 在飞书里发送 `/family-daily-briefing 跑一次今天的家庭全球简报`
 
 ## 5. 手动测试知识库
 
 在 Hermes 或飞书里运行：
 
 ```text
-/family-intelligence-briefing 跑一次今天的家庭全球简报，保存到知识库，并把摘要发回当前飞书会话
+/family-daily-briefing 跑一次今天的家庭全球简报，保存到知识库，并把摘要发回当前飞书会话
 ```
 
 检查：
@@ -88,8 +95,8 @@ ls -la ~/family-intelligence-vault
 
 ```bash
 hermes cron create "0 8 * * *" \
-  "Use the family-intelligence-briefing skill to produce today's family global intelligence briefing. Save the full Markdown to the configured vault path. Deliver the final Feishu/Lark summary using the exact template defined in the skill, without raw Markdown, tool logs, or CronJob Response text." \
-  --skill family-intelligence-briefing \
+  "Use family-daily-briefing. You MUST write 00_Inbox/Hermes/News/YYYY-MM-DD-news.md, 00_Inbox/Hermes/Captures/YYYY-MM-DD-captures.md, and 05_Output/Daily_Briefings/YYYY-MM-DD-briefing.md to the configured vault path before returning the Feishu summary. If file writing fails, say FILE_WRITE_FAILED." \
+  --skill family-daily-briefing \
   --deliver feishu \
   --name family-daily-briefing
 ```
@@ -98,8 +105,8 @@ hermes cron create "0 8 * * *" \
 
 ```bash
 hermes cron create "0 20 * * 0" \
-  "Use the family-intelligence-briefing skill to consolidate the last 7 daily notes into a review-pending weekly review. Save it to 05_Output/Weekly_Reviews. Do not update long-term topic, asset, graph, project, report, or article notes." \
-  --skill family-intelligence-briefing \
+  "Use family-weekly-review. Write only 05_Output/Weekly_Reviews/YYYY-Www.md and optionally 00_Inbox/AI_Processed/To_Review/YYYY-MM-DD-weekly-review.md. Do not update long-term notes." \
+  --skill family-weekly-review \
   --deliver feishu \
   --name family-weekly-knowledge
 ```
@@ -130,8 +137,54 @@ journalctl --user -u hermes-gateway -f
 
 或根据你的安装方式查看 Hermes gateway 日志。
 
+## 8. 更新已有 Cron
+
+如果服务器已经存在旧任务，不要新建重复任务，直接更新 `~/.hermes/cron/jobs.json`：
+
+```bash
+cp ~/.hermes/cron/jobs.json ~/.hermes/cron/jobs.json.bak.$(date +%F-%H%M%S)
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+p = Path.home() / ".hermes/cron/jobs.json"
+data = json.loads(p.read_text())
+
+daily_prompt = (
+    "Use family-daily-briefing. You MUST write "
+    "00_Inbox/Hermes/News/YYYY-MM-DD-news.md, "
+    "00_Inbox/Hermes/Captures/YYYY-MM-DD-captures.md, and "
+    "05_Output/Daily_Briefings/YYYY-MM-DD-briefing.md to the configured vault path "
+    "before returning the Feishu summary. If file writing fails, say FILE_WRITE_FAILED."
+)
+weekly_prompt = (
+    "Use family-weekly-review. Write only 05_Output/Weekly_Reviews/YYYY-Www.md and "
+    "optionally 00_Inbox/AI_Processed/To_Review/YYYY-MM-DD-weekly-review.md. "
+    "Do not update long-term notes."
+)
+
+for job in data.get("jobs", []):
+    if job.get("name") == "family-daily-briefing":
+        job["skill"] = "family-daily-briefing"
+        job["skills"] = ["family-daily-briefing"]
+        job["prompt"] = daily_prompt
+    elif job.get("name") == "family-weekly-knowledge":
+        job["skill"] = "family-weekly-review"
+        job["skills"] = ["family-weekly-review"]
+        job["prompt"] = weekly_prompt
+
+p.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+PY
+hermes gateway restart
+hermes cron list
+```
+
+## 9. Git 同步脚本
+
+`scripts/hermes_git_sync.sh` 默认只同步 Hermes 已写入的真实文件，不再生成空白日报占位文件。少数情况下如果只是想补目录骨架，可手动加 `--generate-placeholders`。
+
 ## 设计原则
 
 不要在本项目里配置 LLM、Tavily、scheduler、数据库、飞书消息 API 或独立 agent。Hermes 已经处理这些。
 
-本仓库只承担一件事：给 Hermes 一个清晰、可复用的家庭资讯工作流 skill。
+本仓库只承担一件事：给 Hermes 几个短而明确的家庭资讯工作流 skills。

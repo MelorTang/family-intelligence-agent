@@ -4,7 +4,7 @@
 
 # Architecture
 
-云端服务器只运行 Hermes、定时任务、Markdown 文件生成和 Git 同步。它不运行 Claude Code、Codex、Antigravity 或其他重 agent。
+云端服务器只运行 Hermes、定时任务、Hermes 写入和 Git 同步。它不运行 Claude Code、Codex、Antigravity 或其他重 agent。
 
 本地 Mac 或可信海外环境可以手动运行 Claude Code、Codex、Antigravity 或其他 CLI agent。Agent 把这个 vault 当成普通 Markdown/Git 仓库处理，不需要 Obsidian 插件才能工作。
 

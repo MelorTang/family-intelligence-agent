@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 DRY_RUN=false
-RUN_GENERATORS=true
+RUN_GENERATORS=false
 RUN_AI=false
 VAULT_PATH="${VAULT_PATH:-}"
 REMOTE="${GIT_REMOTE:-origin}"
@@ -33,9 +33,10 @@ CONTENT_PATHS=(
 
 usage() {
   cat <<'EOF'
-Usage: hermes_git_sync.sh --vault /path/to/obsidian-vault [--dry-run] [--no-generate] [--ai]
+Usage: hermes_git_sync.sh --vault /path/to/obsidian-vault [--dry-run] [--generate-placeholders] [--ai]
 
 Safely syncs Hermes-generated Obsidian files through GitHub.
+By default this script does not create placeholder daily files; Hermes skills should write real content first.
 EOF
 }
 
@@ -47,6 +48,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --dry-run)
       DRY_RUN=true
+      shift
+      ;;
+    --generate-placeholders)
+      RUN_GENERATORS=true
       shift
       ;;
     --no-generate)
