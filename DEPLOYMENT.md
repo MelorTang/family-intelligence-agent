@@ -181,7 +181,15 @@ hermes cron list
 
 ## 9. Git 同步脚本
 
-`scripts/hermes_git_sync.sh` 默认只同步 Hermes 已写入的真实文件，不再生成空白日报占位文件。少数情况下如果只是想补目录骨架，可手动加 `--generate-placeholders`。
+`scripts/hermes_git_sync.sh` 默认会先尝试从 `~/.hermes/cron/output` 导入当天 Hermes cron response。这样即使 Hermes 只把日报发到飞书、没有真正写入 vault，脚本也会生成 recovered 版 `News / Captures / Daily_Briefing` 后再提交。
+
+它不会覆盖已有的实质性笔记，也不会生成空白日报占位文件。少数情况下如果只是想补目录骨架，可手动加 `--generate-placeholders`；如果想关闭 cron output 导入，可加 `--no-cron-import`。
+
+cron 的 shell 输出不要重定向到 vault 内的 tracked 文件，否则重定向本身会让 `git pull --rebase` 看到未提交改动。推荐：
+
+```cron
+10 8 * * * /home/ubuntu/family-intelligence-agent/scripts/hermes_git_sync.sh --vault /home/ubuntu/family-intelligence-vault >> /home/ubuntu/hermes_git_sync_cron.log 2>&1
+```
 
 ## 设计原则
 

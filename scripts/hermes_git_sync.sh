@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 DRY_RUN=false
 RUN_GENERATORS=false
+RUN_CRON_IMPORT=true
 RUN_AI=false
 VAULT_PATH="${VAULT_PATH:-}"
 REMOTE="${GIT_REMOTE:-origin}"
@@ -33,10 +34,11 @@ CONTENT_PATHS=(
 
 usage() {
   cat <<'EOF'
-Usage: hermes_git_sync.sh --vault /path/to/obsidian-vault [--dry-run] [--generate-placeholders] [--ai]
+Usage: hermes_git_sync.sh --vault /path/to/obsidian-vault [--dry-run] [--no-cron-import] [--generate-placeholders] [--ai]
 
 Safely syncs Hermes-generated Obsidian files through GitHub.
-By default this script does not create placeholder daily files; Hermes skills should write real content first.
+By default this script imports today's Hermes cron response if the skill did not write files.
+It does not create placeholder daily files unless --generate-placeholders is passed.
 EOF
 }
 
@@ -52,6 +54,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --generate-placeholders)
       RUN_GENERATORS=true
+      shift
+      ;;
+    --no-cron-import)
+      RUN_CRON_IMPORT=false
       shift
       ;;
     --no-generate)
@@ -168,6 +174,12 @@ fi
 
 if [[ "$DRY_RUN" != "true" ]]; then
   check_dirty_scope || die "post-pull" "Pull produced changes outside Hermes write boundary"
+fi
+
+if [[ "$RUN_CRON_IMPORT" == "true" ]]; then
+  import_args=(--vault "$VAULT_PATH" --date "$TODAY")
+  [[ "$DRY_RUN" == "true" ]] && import_args+=(--dry-run)
+  python3 "$SCRIPT_DIR/import_hermes_cron_output.py" "${import_args[@]}" | tee -a "$LOG_FILE"
 fi
 
 if [[ "$RUN_GENERATORS" == "true" ]]; then

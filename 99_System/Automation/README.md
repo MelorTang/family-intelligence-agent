@@ -64,13 +64,13 @@ Cloud sync uses `scripts/hermes_git_sync.sh`. It runs:
 ```text
 git fetch
 git pull --rebase
-keep only Hermes-written files
+import Hermes cron response if Hermes did not write vault files
 git add allowed paths only
 git commit
 git push
 ```
 
-It does not create placeholder daily files by default. Hermes skills should write real content first; the sync script only stages, commits, and pushes allowed paths. It never runs `git add .`, `git reset --hard`, force push, or automatic deletes.
+It does not create placeholder daily files by default. If Hermes only produced a Feishu response, the sync script recovers that response from `~/.hermes/cron/output` into review-pending Markdown files. It never runs `git add .`, `git reset --hard`, force push, or automatic deletes.
 
 ## Conflict Handling
 
@@ -122,8 +122,9 @@ Avoid restoring broad directories unless you have checked what will change.
 ## Cron Example
 
 ```cron
-0 7 * * * /home/ubuntu/family-intelligence-vault/scripts/hermes_git_sync.sh --vault /home/ubuntu/family-intelligence-vault >> /home/ubuntu/family-intelligence-vault/99_System/Automation/logs/cron.log 2>&1
-0 23 * * * /home/ubuntu/family-intelligence-vault/scripts/hermes_git_sync.sh --vault /home/ubuntu/family-intelligence-vault >> /home/ubuntu/family-intelligence-vault/99_System/Automation/logs/cron.log 2>&1
+10 8 * * * /home/ubuntu/family-intelligence-agent/scripts/hermes_git_sync.sh --vault /home/ubuntu/family-intelligence-vault >> /home/ubuntu/hermes_git_sync_cron.log 2>&1
 ```
+
+Do not redirect cron output to a tracked file inside the vault. The shell redirection itself makes the working tree dirty before `git pull --rebase` runs.
 
 Hermes cron can also run prompts directly. Keep Hermes prompts aligned with the same write boundary.
